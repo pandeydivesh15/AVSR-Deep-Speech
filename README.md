@@ -1,4 +1,4 @@
-# Audio and Visual Speech Recognition using Deep Learning
+# Audio and Visual Speech Recognition(AVSR) using Deep Learning
 
 _This is my [Google Summer of Code 2017](https://summerofcode.withgoogle.com/projects/#5019227963523072) Project with [the Distributed Little Red Hen Lab](http://www.redhenlab.org/)._
 
@@ -9,6 +9,11 @@ Now, it is common for news videos to incorporate both auditory and visual modali
 This project is based on the approach discussed in paper [Deep Speech](https://arxiv.org/abs/1412.5567). This paper discusses speech recognition using audio modality only, hence this project can be seen as an extension to Deep Speech model.
 
 ## Getting Started
+
+### Prerequisites
+
+* [TensorFlow 1.0 or above](https://www.tensorflow.org/install/)
+* [SciPy](https://scipy.org/install.html)
 
 
 

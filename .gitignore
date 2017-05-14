@@ -1,3 +1,13 @@
+# My additions
+# Ignoring any ipython notebooks which I may create during the project. 
+*.ipynb
+
+
+
+
+
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

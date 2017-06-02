@@ -8,28 +8,30 @@ Now, it is common for news videos to incorporate both auditory and visual modali
 
 This project is based on the approach discussed in paper [Deep Speech](https://arxiv.org/abs/1412.5567). This paper discusses speech recognition using audio modality only, hence this project can be seen as an extension to Deep Speech model.
 
-## Project Structure
-
-1. **bin** directory: Contains all helper scripts. A fully developed project will be run through these scripts only.
-
-2. **data**: All media files and CSV files reside here. Contains no code.
-
-3. **util**: All helper Python classes and other scripts. These scripts contains:
-
-	* Dataset handling Classes: The data stored in CSV files and media files handled here. The neural architecture interacts with this class(or classes) for data inflow.
-
-	* Spell Check script: The spell checking system(KenLM) resides here.
-
-	* Text/Audio/Video Handling scripts: Reading/analyzing text/audio/video, calculating MFCC frames, etc.
-
-4. **AVSRDeepSpeech.py**: Main script of the project. Constructs our neural architecture, trains the model, and exports trained weights. This script is same as primary Deep Speech's script (very few changes).
-
 ## Getting Started
 
 ### Prerequisites
 
+* [Git Large File Storage](https://git-lfs.github.com/)
 * [TensorFlow 1.0 or above](https://www.tensorflow.org/install/)
 * [SciPy](https://scipy.org/install.html)
+* [PyXDG](https://pypi.python.org/pypi/pyxdg)
+* [python_speech_features](https://pypi.python.org/pypi/python_speech_features)
+* [python sox](https://pypi.python.org/pypi/sox)
+* [pandas](https://pypi.python.org/pypi/pandas#downloads)
+
+### Installing
+
+* Firstly, install [Git Large File Storage(LFS) Support](https://git-lfs.github.com/).
+* Open terminal and type following commands.
+```bash
+$ git clone https://github.com/pandeydivesh15/AVSR-Deep-Speech.git
+$ cd AVSR-Deep-Speech
+$ pip install -r requirements.txt 
+```
+
+
+
 
 
 

@@ -2,6 +2,12 @@
 # Ignoring any ipython notebooks which I may create during the project. 
 *.ipynb
 
+# Any media files
+*.mp4
+*.wav
+
+# Any csv files
+*.csv
 
 
 

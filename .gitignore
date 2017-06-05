@@ -6,6 +6,10 @@
 *.mp4
 *.wav
 
+# Alignment info containing json files
+*.json
+*.jsonl
+
 # Any csv files
 *.csv
 

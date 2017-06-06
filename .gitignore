@@ -10,8 +10,8 @@
 *.json
 *.jsonl
 
-# Any csv files
-*.csv
+# Clean data folder, containing actual preprocessed data for training, testing
+data/clean_data
 
 
 

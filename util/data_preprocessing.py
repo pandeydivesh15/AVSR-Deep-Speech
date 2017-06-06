@@ -32,7 +32,7 @@ def find_text_and_time_limits(alignment_data):
 			continue
 		if word_dict['end'] - split_time_start >= WAV_FILE_MIN_LEN:
 			if word_dict.has_key("punctuation"):
-				data.append((transcript.lower(), (split_time_start, word_dict['end'])))
+				data.append((transcript.lower().strip(), (split_time_start, word_dict['end'])))
 				transcript = ""
 				split_time_start = word_dict['end']
 			else:

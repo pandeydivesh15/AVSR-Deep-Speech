@@ -1,6 +1,8 @@
 import glob
 import wave
 import json
+import os
+import pandas
 
 WAV_FILE_MIN_LEN = 2.00 # in seconds
 
@@ -82,5 +84,23 @@ def split_aligned_audio(audio_dir, json_dir	, output_dir):
 		split(split_info, audio_file_name, audio_file_path, output_dir)
 
 
+def create_csv(data_dir):
+	audio_file_paths = sorted(glob.glob(data_dir + "*.wav"))
+	transcript_file_paths = sorted(glob.glob(data_dir + "*.txt"))
+	
+	audio_file_sizes = []
+	transcripts = []
 
+	for x, y in zip(audio_file_paths, transcript_file_paths):
+	    with open(y, "rb") as f:
+	        transcripts.append(f.read())
+	    
+	    metadata = os.stat(x)
+	    audio_file_sizes.append(metadata.st_size)
 
+	df = pandas.DataFrame(columns=["wav_filename", "wav_filesize", "transcript"])
+	df["wav_filename"] = audio_file_paths
+	df["wav_filesize"] = audio_file_sizes
+	df["transcript"] = transcripts
+	
+	df.to_csv(data_dir + "data.csv", sep=",", index=None)

@@ -10,4 +10,5 @@ json_dir = "data/RHL_json/"
 output_dir = "data/clean_data/train/"
 
 data_preprocessing.split_aligned_audio(audio_dir, json_dir, output_dir)
+data_preprocessing.create_csv(output_dir)
 

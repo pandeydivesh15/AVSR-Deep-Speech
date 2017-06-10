@@ -3,8 +3,21 @@ import wave
 import json
 import os
 import pandas
+import subprocess
 
 WAV_FILE_MIN_LEN = 2.00 # in seconds
+
+def convert_mp4(video_dir, audio_dir):
+	# Get all file names
+	video_file_names = sorted(glob.glob(video_dir + "*.mp4"))
+	# Extract actual names of file, also remove any extensions
+	video_names = map(lambda x : x.split('/')[-1].split(".")[0], video_file_names)
+
+	# Command for converting video to audio
+	command = "ffmpeg -i " + video_dir + "{0}.mp4 -ab 96k -ar 44100 -vn " + audio_dir + "{0}.wav"
+
+	for name in video_names:
+		subprocess.call(command.format(name), shell=True)
 
 def read_json_file(file_path):
 	data = []
@@ -44,44 +57,63 @@ def find_text_and_time_limits(alignment_data):
 				transcript += " " + word_dict['word']
 	return data
 
-def split(split_info_tuple, file_name, file_path, output_dir):
-	audio_file = wave.open(file_path, 'rb')
+def split(split_file_path, main_file_path, transcript_path, split_info):
+	audio_file = wave.open(main_file_path, 'rb')
+	split_file = wave.open(split_file_path, 'wb')
 
-	for data, i  in zip(split_info_tuple, range(len(split_info_tuple))):
-		split_file_name = output_dir + file_name + str(i).zfill(5) + ".wav"
-		split_file = wave.open(split_file_name, 'wb')
+	t0, t1 = split_info[1] # cut audio between t0, t1 seconds
+	s0, s1 = int(t0*audio_file.getframerate()), int(t1*audio_file.getframerate())
 
-		t0, t1 = data[1] # cut audio between t0, t1 seconds
-		s0, s1 = int(t0*audio_file.getframerate()), int(t1*audio_file.getframerate())
-		
-		# The next step forces me to open and close the main file multiple times, in order to prepare correct data. 
-		audio_file.readframes(s0) # discard frames upto s0
-		frames = audio_file.readframes(s1-s0)
+	audio_file.readframes(s0) # discard frames up to s0
+	frames = audio_file.readframes(s1-s0)
 
-		split_file.setparams(audio_file.getparams())
-		split_file.writeframes(frames)
-		split_file.close()
-		
+	split_file.setparams(audio_file.getparams())
+	split_file.writeframes(frames)
+	split_file.close()
+	
+	# Store transcript
+	with open(transcript_path, 'wb') as f:
+		f.write(split_info[0])
 
-		# Store transcript
-		with open(output_dir + file_name + str(i).zfill(5) + ".txt", 'wb') as f:
-			f.write(data[0])
+	# TODO: Get rid of multiple opening and closing of the same main audio file.
+	audio_file.close()
+	
 
-		# TODO: Get rid of multiple opening and closing of the same main audio file.
-		audio_file.close()
-		audio_file = wave.open(file_path, 'rb')
+def split_aligned_audio(audio_dir, json_dir	, output_dir_train, output_dir_dev,
+						output_dir_test, train_split, dev_split, test_split):
+	split_info = []
+	total_audio_files = 0 # denotes total wav files after splitting
 
-def split_aligned_audio(audio_dir, json_dir	, output_dir):
 	json_file_names = sorted(glob.glob(json_dir + "*.json?"))
-
 	for file_path in json_file_names:
 		data = read_json_file(file_path)
-		split_info = find_text_and_time_limits(data)
+		split_info.append(find_text_and_time_limits(data))
+		total_audio_files += len(split_info[-1])
 
+	# TODO: Use a better way to split audios between train, dev, and test directories. Bring randomness
+	dev_limit_start = int(train_split * total_audio_files)
+	dev_limit_end = dev_limit_start + int(dev_split * total_audio_files)
+
+	split_file_count = 0
+
+	for file_path, info in zip(json_file_names, split_info):
 		audio_file_name = file_path.split('/')[-1].split('.')[0]
 		audio_file_path = audio_dir + audio_file_name + '.wav'
 
-		split(split_info, audio_file_name, audio_file_path, output_dir)
+		for data, i  in zip(info, range(len(info))):
+			# Set output directory either equal to train or test or dev
+			if split_file_count < dev_limit_start:
+				output_dir = output_dir_train
+			elif split_file_count < dev_limit_end:
+				output_dir = output_dir_dev
+			else:
+				output_dir = output_dir_test
+
+			split_file_path = output_dir + audio_file_name + str(i).zfill(5) + ".wav"
+			transcript_file_path = output_dir + audio_file_name + str(i).zfill(5) + ".txt"
+
+			split(split_file_path, audio_file_path, transcript_file_path, data)
+			split_file_count += 1
 
 
 def create_csv(data_dir):

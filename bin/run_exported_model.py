@@ -14,7 +14,10 @@ parser = argparse.ArgumentParser(
 parser.add_argument('-d', '--export_dir', type=str,
 					help="Dir where the trained model's meta graph and data were exported")
 parser.add_argument('-wd', '--wav_dir', type=str,
-					help='Dir where wav files are stored (files for conversion)')
+					help="Dir where wav files are stored (all files' transcripts will be generated)")
+parser.add_argument('-f', '--wav_file', type=str,
+					help="Wav file's location: Only one transcript generated. \
+					If --wav_dir is given, --wav_file will have no effect.")
 parser.add_argument('-n', '--model_name', type=str,
 					help='Name of the model exported')
 
@@ -29,6 +32,8 @@ model.restore_model()
 
 if args.wav_dir:
 	wav_file_paths = sorted(glob.glob(args.wav_dir + '*.wav'))
+elif args.wav_file:
+	wav_file_paths = [args.wav_file, ]
 else:
 	wav_file_paths = ['data/ldc93s1/LDC93S1.wav']
 

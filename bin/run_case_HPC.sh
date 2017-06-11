@@ -15,11 +15,11 @@ python -u DeepSpeech_RHL.py \
   --train_files data/clean_data/train/data.csv \
   --dev_files data/clean_data/train/data.csv \
   --test_files data/clean_data/train/data.csv \
-  --train_batch_size 40 \
+  --train_batch_size 20 \
   --dev_batch_size 10 \
   --test_batch_size 10 \
   --n_hidden 494 \
   --epoch 50 \
   --checkpoint_dir "$checkpoint_dir" \
-  --export_dir data/export_model/
+  --export_dir data/export/
   "$@"

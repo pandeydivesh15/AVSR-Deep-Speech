@@ -25,8 +25,8 @@ def text_to_char_array(original):
     result = np.hstack([SPACE_TOKEN if xt == '' else list(xt) for xt in result])
 
     # Map characters into indicies
-    # result = np.asarray([SPACE_INDEX if xt == SPACE_TOKEN else (ord(xt) - FIRST_INDEX if ord(xt)>FIRST_INDEX else 26+int(xt)) for xt in result])
-    result = np.asarray([SPACE_INDEX if xt == SPACE_TOKEN else (ord(xt) - FIRST_INDEX if ord(xt)>FIRST_INDEX else 26+int(xt)) for xt in result])
+    result = np.asarray([SPACE_INDEX if xt == SPACE_TOKEN else (
+        ord(xt) - FIRST_INDEX if ord(xt)>FIRST_INDEX else 27+int(xt)) for xt in result])
     # Add result to results
     return result
 
@@ -66,7 +66,7 @@ def sparse_tuple_to_texts(tuple):
         index = indices[i][0]
         c = values[i]
         # c = ' ' if c == SPACE_INDEX else chr(c + FIRST_INDEX)
-        c = ' ' if c == SPACE_INDEX else (chr(c + FIRST_INDEX) if c <= 26 else str(c-26))
+        c = ' ' if c == SPACE_INDEX else (chr(c + FIRST_INDEX) if c <= 26 else str(c-27))
         results[index] = results[index] + c
     # List of strings
     return results
@@ -74,7 +74,7 @@ def sparse_tuple_to_texts(tuple):
 def ndarray_to_text(value):
     results = ''
     for i in range(len(value)):
-        results += (chr(value[i] + FIRST_INDEX) if value[i] <= 26 else str(value[i]-26))
+        results += (chr(value[i] + FIRST_INDEX) if value[i] <= 26 else str(value[i]-27))
         # results += chr(value[i] + FIRST_INDEX)
     return results.replace('`', ' ')
 

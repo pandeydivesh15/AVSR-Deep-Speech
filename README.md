@@ -33,7 +33,7 @@ $ pip install -r requirements.txt
 
 ## Data-Preprocessing for Training
 
-Please note that these data-preprocessing steps are only required if your training audio/video files are quite long (> 1 min). **If you have access to shorter wav files (length in secs) and their associated transcripts, you will not require any data-preprocessing** (you will need CSV files too, see [bin/import_ldc93s1.py](./bin/import_ldc93s1.py) for one example). In case you have longer audio/video files, it is suggested to use data-preprocessing.
+Please note that these data-preprocessing steps are only required if your training audio/video files are quite long (> 1 min). **If you have access to shorter wav files (length in secs) and their associated transcripts, you will not require any data-preprocessing** (you must have CSV files too, see [bin/import_ldc93s1.py](./bin/import_ldc93s1.py) for downloading one example dataset). In case you have longer audio/video files, it is suggested to use data-preprocessing.
 
 These steps require videos/audios and their associated time-aligned transcripts. Time aligned time stamps for your audios/videos can be found using [Gentle](https://github.com/lowerquality/gentle/) or [Red Hen Lab's Audio Pipeline](https://github.com/RedHenLab/Audio/tree/master/Pipeline) or any other alignment application.
 
@@ -66,6 +66,8 @@ After this step, all prepared data files(train, dev, test) will be stored in dat
 
 ## Training
 
+#### Original DeepSpeech
+
 The original [Deep Speech model](https://github.com/mozilla/DeepSpeech), provided many command line options. To view those options, directly open the [main script](./DeepSpeech.py) or you can also type:
 ```bash
 $ ./DeepSpeech.py --help 
@@ -76,9 +78,11 @@ To run the original Deep Speech code, with a sample dataset (called LDC93S1) and
 ```bash
 $ ./bin/run-ldc93s1.sh
 ```
-This script first installs the LDC93S1 dataset at data/ldc93s1/. Afterward, it trains on that dataset, outputs stats for each epoch, and finally outputs WER report for any dev or test data.
+This script first installs the LDC93S1 dataset at data/ldc93s1/. Afterward, it runs DeepSpeech.py. It trains on LDC93S1 dataset, outputs stats for each epoch, and finally outputs WER report for any dev or test data.
 
-**Note**: Any code modifications for Red Hen Lab will be reflected in [**DeepSpeech_RHL.py**](./DeepSpeech_RHL.py). One such modification is that DeepSpeech_RHL.py allows transcripts to have digits[0-9] too, unlike original [DeepSpeech.py](./DeepSpeech.py).
+#### DeepSpeech_RHL.py
+
+Any code modifications for Red Hen Lab will be reflected in [**DeepSpeech_RHL.py**](./DeepSpeech_RHL.py). One such modification is that DeepSpeech_RHL.py allows transcripts to have digits[0-9] too, unlike original [DeepSpeech.py](./DeepSpeech.py).
 
 To run modified DeepSpeech on your system (with default settings), open terminal and run:
 
@@ -94,7 +98,35 @@ $ ./bin/run-ldc93s1_RHL.sh
 # This script runs on LDC93S1 dataset. It doesn't exports any model.
 ```
 
-Feel free to modify any of the above scripts for your use. 
+Feel free to modify any of the above scripts for your use.
+
+## Checkpointing
+
+During training of a model so called checkpoints will get stored on disk. This takes place at a configurable time interval. The purpose of checkpoints is to allow interruption (also in case of some unexpected failure) and later continuation of training without loosing hours of training time. Resuming from checkpoints happens automatically by just (re)starting training with the same `--checkpoint_dir` of the former run.
+
+Be aware however that checkpoints are only valid for the same model geometry they had been generated from. In other words: If there are error messages of certain `Tensors` having incompatible dimensions, this is most likely due to an incompatible model change. One usual way out would be to wipe all checkpoint files in the checkpoint directory or changing it before starting the training. 
+
+## Exporting model and Testing
+
+If the `--export_dir` parameter is provided to DeepSpeech_RHL.py, a model will have been exported to this directory during training. This exported model can then be used for predicting transcripts for new audio/video files.
+
+For running an exported model for new inputs, see [run_exported_model.py](./bin/run_exported_model.py). This python script allows four optional arguments.
+
+Argument			|	Description 
+---				|	---
+-d, --export_dir	|	Dir where the trained model's meta graph and data were exported
+-wd, --wav_dir		|	Dir where wav files are stored (all files' transcripts will be generated)
+-f, --wav_file		|	Wav file's location: Only one transcript generated. If --wav_dir is given, --wav_file will have no effect.
+-n, --model_name	|	Name of the model exported
+
+For running an exported model with default settings, run:
+```bash
+$ python ./bin/run_exported_model.py
+```
+This script, by default, runs on data/ldc93s1/LDC93S1.wav file. In case you dont have LDC93S1 dataset downloaded, run:
+```bash
+$ python -u bin/import_ldc93s1.py ./data/ldc93s1 
+```
 
 ## Acknowledgments
 

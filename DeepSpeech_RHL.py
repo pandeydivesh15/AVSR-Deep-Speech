@@ -243,8 +243,8 @@ def initialize_globals():
 
     # The number of characters in the target language plus one
     global n_character
-    n_character = 40 # TODO: Determine if this should be extended with other punctuation
-
+    n_character = 39 # TODO: Determine if this should be extended with other punctuation
+    
     # The number of units in the sixth layer
     global n_hidden_6
     n_hidden_6 = n_character

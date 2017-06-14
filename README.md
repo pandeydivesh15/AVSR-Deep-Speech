@@ -66,7 +66,7 @@ After this step, all prepared data files(train, dev, test) will be stored in dat
 
 ## Training
 
-The original [Deep Speech model](https://github.com/mozilla/DeepSpeech), provided many command line options. To view them, open directly the [main script](./DeepSpeech.py) or you can also type:
+The original [Deep Speech model](https://github.com/mozilla/DeepSpeech), provided many command line options. To view those options, directly open the [main script](./DeepSpeech.py) or you can also type:
 ```bash
 $ ./DeepSpeech.py --help 
 ```
@@ -85,7 +85,8 @@ To run modified DeepSpeech on your system (with default settings), open terminal
 ```bash
 $ ./bin/run_case_HPC.sh
 
-# This script trains on your data (placed at data/clean_data/), and finally exports model at data/export/.
+# This script trains on your data (placed at data/clean_data/), 
+# and finally exports model at data/export/.
 ```
 ```bash
 $ ./bin/run-ldc93s1_RHL.sh

@@ -5,17 +5,20 @@ from util.text import ndarray_to_text
 from util.audio import audiofile_to_input_vector
 
 # These constants must be same as those used during training.
+# In main `DeepSpeech_RHL.py` script, 
+# `NUM_MFCC_COEFF` is denoted by `n_input` and `N_CONTEXT` is denoted by `n_context`
 NUM_MFCC_COEFF = 26
 N_CONTEXT = 9
 
+
 class DeepSpeechModel(object):
-	"""Handles with trained Deep Speech model"""
+	"""Handles trained Deep Speech model"""
 	def __init__(self, export_dir, model_name):
 		'''
 		Args:
-			export_dir(type = str): Path to directory where trained model 
+			export_dir(type = str):	Path to directory where trained model 
 									has been exported (with trailing slash).
-			model_name(type = str): Name of the model exported.
+			model_name(type = str):	Name of the model exported.
 		'''
 		self.export_dir = export_dir
 		self.session = tf.Session()
@@ -26,6 +29,7 @@ class DeepSpeechModel(object):
 		saver = tf.train.import_meta_graph(self.export_dir + self.name + '.meta')
 		saver.restore(self.session, tf.train.latest_checkpoint(self.export_dir))
 
+		# Get input and output nodes
 		graph = tf.get_default_graph()
 		self.input = graph.get_tensor_by_name("input_node:0")
 		self.input_len = graph.get_tensor_by_name("input_lengths:0")
@@ -34,7 +38,7 @@ class DeepSpeechModel(object):
 	def find_transcripts(self, wav_file_paths):
 		'''
 		Args: 
-			wav_file_paths: A list containing filepaths for each wav file.
+			wav_file_paths:	A list containing filepaths for each wav file.
 							Type of each element = str 
 		'''
 		transcripts = []
@@ -57,6 +61,7 @@ class DeepSpeechModel(object):
 		return transcripts
 
 	def close(self):
+		# Close tensorflow session
 		self.session.close()
 
 

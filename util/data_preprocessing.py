@@ -5,9 +5,16 @@ import os
 import pandas
 import subprocess
 
+# Minimum length of split .wav file
 WAV_FILE_MIN_LEN = 2.00 # in seconds
 
 def convert_mp4(video_dir, audio_dir):
+	'''
+	Args: 
+		1. video_dir:	Directory for all video files
+		2. audio_dir:	Directory where all converted files will be stored.
+	'''
+
 	# Get all file names
 	video_file_names = sorted(glob.glob(video_dir + "*.mp4"))
 	# Extract actual names of file, also remove any extensions
@@ -20,6 +27,14 @@ def convert_mp4(video_dir, audio_dir):
 		subprocess.call(command.format(name), shell=True)
 
 def read_json_file(file_path):
+	'''
+	Args:
+		1. file_path:	File path for a json file. 
+						File should be similar to the format -
+						https://gist.github.com/pandeydivesh15/2012ab10562cc85e796e1f57554aca33
+	Returns:
+		data:	A list of dicts. Each dict contains timing info for a spoken word(or punctuation).
+	'''
 	data = []
 	with open(file_path, 'r') as f:
 		for line in f:
@@ -35,8 +50,21 @@ def read_json_file(file_path):
 	return data
 
 def find_text_and_time_limits(alignment_data):
+	'''
+	Args: 
+		alignment_data:	The list of dicts returned by `read_json_file()` method.
+						Contains time-alignment data for a specific .wav file.
+	Returns:
+		data:	A list with each element of the form (x, (y, z)). 
+				Each element gives info for a new split .wav file.
+				`x` represents transcript for a split wav file.
+				`y` represents starting time (in secs) in actual .wav file.
+				`z` represents ending time in actual .wav file.
+	Note: Using `y` and `z` for each element in `data`, main .wav will be split into many parts.
+	'''
+
 	data = []
-	# 'data' will hold items of the form (x, (y, z))
+	# 'data' will hold tuples of the form (x, (y, z))
 	split_time_start = 0.00
 	transcript  = ""
 
@@ -58,6 +86,15 @@ def find_text_and_time_limits(alignment_data):
 	return data
 
 def split(split_file_path, main_file_path, transcript_path, split_info):
+	'''
+	Here, splitting takes place.
+
+	Args:
+		split_file_path:	File path for new split file.
+		main_file_path:		File path for original .wav file.
+		transcript_path:	File path where transcript will be written.
+		split_info:			A tuple of the form (x, (y, z))
+	'''
 	audio_file = wave.open(main_file_path, 'rb')
 	split_file = wave.open(split_file_path, 'wb')
 
@@ -81,9 +118,23 @@ def split(split_file_path, main_file_path, transcript_path, split_info):
 
 def split_aligned_audio(audio_dir, json_dir	, output_dir_train, output_dir_dev,
 						output_dir_test, train_split, dev_split, test_split):
-	split_info = []
-	total_audio_files = 0 # denotes total wav files after splitting
+	'''
+	Args:
+		audio_dir:			Dir where all main .wav file are stored.
+		json_dir:			Dir where all related .json file are stored. 
+							Json should exist for each video.
+		output_dir_train:	Output train data dir.
+		output_dir_dev:		Output validation data dir.
+		output_dir_test:	Output test data dir.
+		train_split:		Train data ratio / %
+		dev_split:			Validation data ratio / %
+		test_split:			Test data ratio / %	
+	'''
 
+	split_info = []
+	total_audio_files = 0 # denotes total wav files we will get after splitting
+
+	# Get all json files' paths, and calculate splitting info from each json file.
 	json_file_names = sorted(glob.glob(json_dir + "*.json?"))
 	for file_path in json_file_names:
 		data = read_json_file(file_path)
@@ -91,10 +142,11 @@ def split_aligned_audio(audio_dir, json_dir	, output_dir_train, output_dir_dev,
 		total_audio_files += len(split_info[-1])
 
 	# TODO: Use a better way to split audios between train, dev, and test directories. Bring randomness
+	# Find proper limits according to args `train_split`, `dev_split`, `test_split`
 	dev_limit_start = int(train_split * total_audio_files)
 	dev_limit_end = dev_limit_start + int(dev_split * total_audio_files)
 
-	split_file_count = 0
+	split_file_count = 0 # Counts number of split files.
 
 	for file_path, info in zip(json_file_names, split_info):
 		audio_file_name = file_path.split('/')[-1].split('.')[0]
@@ -102,6 +154,7 @@ def split_aligned_audio(audio_dir, json_dir	, output_dir_train, output_dir_dev,
 
 		for data, i  in zip(info, range(len(info))):
 			# Set output directory either equal to train or test or dev
+			# Decided by args `train_split`, `dev_split`, `test_split`
 			if split_file_count < dev_limit_start:
 				output_dir = output_dir_train
 			elif split_file_count < dev_limit_end:
@@ -109,14 +162,26 @@ def split_aligned_audio(audio_dir, json_dir	, output_dir_train, output_dir_dev,
 			else:
 				output_dir = output_dir_test
 
+			# Generate file paths for transcript and split .wav file.
 			split_file_path = output_dir + audio_file_name + str(i).zfill(5) + ".wav"
 			transcript_file_path = output_dir + audio_file_name + str(i).zfill(5) + ".txt"
 
+			# Split the main file
 			split(split_file_path, audio_file_path, transcript_file_path, data)
 			split_file_count += 1
 
 
 def create_csv(data_dir):
+	'''
+	Generates CSV file (as required by DeepSpeech_RHL.py) in the given dir.
+
+	Args:
+		data_dir:	Directory where all .wav files and 
+					their associated timescripts are stored.
+
+	'''
+
+	# Get all audio and transcript file paths.
 	audio_file_paths = sorted(glob.glob(data_dir + "*.wav"))
 	transcript_file_paths = sorted(glob.glob(data_dir + "*.txt"))
 	
@@ -127,12 +192,14 @@ def create_csv(data_dir):
 	    with open(y, "rb") as f:
 	        transcripts.append(f.read())
 	    
+	    # Get file size.
 	    metadata = os.stat(x)
 	    audio_file_sizes.append(metadata.st_size)
 
+	# Create pandas dataframe
 	df = pandas.DataFrame(columns=["wav_filename", "wav_filesize", "transcript"])
 	df["wav_filename"] = audio_file_paths
 	df["wav_filesize"] = audio_file_sizes
 	df["transcript"] = transcripts
 	
-	df.to_csv(data_dir + "data.csv", sep=",", index=None)
+	df.to_csv(data_dir + "data.csv", sep=",", index=None) # Save CSV

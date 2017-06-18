@@ -21,6 +21,8 @@ parser.add_argument('-f', '--wav_file', type=str,
 					If --wav_dir is given, --wav_file will have no effect.")
 parser.add_argument('-n', '--model_name', type=str,
 					help='Name of the model exported')
+parser.add_argument('--use_spell_check', default = False, action='store_true',
+					help='Whether to use spell check system for decoded transcripts from RNN')
 
 args = parser.parse_args()
 
@@ -29,7 +31,7 @@ model_name = args.model_name or 'export'
 
 # Create DeepSpeechModel Class object. 
 # This object will be responsible for handling tensorflow model.
-model = DeepSpeechModel(export_dir, model_name)
+model = DeepSpeechModel(export_dir, model_name, args.use_spell_check)
 
 model.restore_model()
 

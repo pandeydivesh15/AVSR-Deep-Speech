@@ -3,6 +3,7 @@ import numpy as np
 
 from util.text import ndarray_to_text
 from util.audio import audiofile_to_input_vector
+from util.spell import correction
 
 # These constants must be same as those used during training.
 # In main `DeepSpeech_RHL.py` script, 
@@ -13,7 +14,7 @@ N_CONTEXT = 9
 
 class DeepSpeechModel(object):
 	"""Handles trained Deep Speech model"""
-	def __init__(self, export_dir, model_name):
+	def __init__(self, export_dir, model_name, use_spell_check=False):
 		'''
 		Args:
 			export_dir(type = str):	Path to directory where trained model 
@@ -23,6 +24,7 @@ class DeepSpeechModel(object):
 		self.export_dir = export_dir
 		self.session = tf.Session()
 		self.name = model_name
+		self.use_spell_check = use_spell_check
 
 	def restore_model(self):
 		# Load meta graph and learned weights
@@ -56,7 +58,10 @@ class DeepSpeechModel(object):
 
 			batch_decoded = self.session.run(self.output, feed_dict)
 			for decoded in batch_decoded[0]:
-				transcripts.append(ndarray_to_text(decoded))
+				if self.use_spell_check:
+					transcripts.append(correction(ndarray_to_text(decoded)))
+				else:
+					transcripts.append(ndarray_to_text(decoded))
 
 		return transcripts
 

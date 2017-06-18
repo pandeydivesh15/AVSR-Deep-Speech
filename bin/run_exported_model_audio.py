@@ -5,7 +5,7 @@ import os
 # Make sure that we can import functions/classes from utils/ folder
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
-from util.exported_model import DeepSpeechModel
+from util.exported_model_audio import DeepSpeechModel
 
 # Argument parser. This script expects 4 optional args.
 parser = argparse.ArgumentParser(

@@ -13,7 +13,7 @@ N_CONTEXT = 9
 
 
 class DeepSpeechModel(object):
-	"""Handles trained Deep Speech model"""
+	"""Handles trained Deep Speech model(for audio only speech recognition)"""
 	def __init__(self, export_dir, model_name, use_spell_check=False):
 		'''
 		Args:

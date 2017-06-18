@@ -50,7 +50,7 @@ elif args.video_file:
 	# Using samplerate and bitrate similar to Red Hen Lab's sample video.
 	cmd = "ffmpeg -i " + args.video_file + " -ab 96k -ar 44100 -vn " + temp_file_path
 	subprocess.call(cmd, shell=True)
-	
+
 	wav_file_paths = [temp_file_path, ]
 else:
 	wav_file_paths = ['data/ldc93s1/LDC93S1.wav'] # default .wav file
@@ -61,8 +61,8 @@ transcripts = model.find_transcripts(wav_file_paths)
 # Each string is the transcript for the corresponding .wav file in `wav_file_paths`.
 print transcripts
 
-# Delete temporary audio file, if --video_file was given
-if args.video_file:
+# Delete temporary audio file, if --video_file was given (other args will not be given)
+if (not args.wav_dir) and (not args.wav_file):
 	os.remove(temp_file_path)
 
 # Close tensorflow session

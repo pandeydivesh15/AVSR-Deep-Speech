@@ -113,11 +113,16 @@ If the `--export_dir` parameter is provided to DeepSpeech_RHL.py, a model will h
 For running an exported model for new inputs, see [run_exported_model.py](./bin/run_exported_model.py). This python script allows four optional arguments.
 
 Argument			|	Description 
----				|	---
+---					|	---
 -d, --export_dir	|	Dir where the trained model's meta graph and data were exported
 -wd, --wav_dir		|	Dir where wav files are stored (all files' transcripts will be generated)
--f, --wav_file		|	Wav file's location: Only one transcript generated. If --wav_dir is given, --wav_file will have no effect.
+-af, --wav_file		|	Wav file's location. Only one transcript generated. If --wav_dir is given, --wav_file will have no effect.
+-vf, --video_file	|	Video file's location. Only one transcript generated. If --wav_dir or --wav_file are also given as args, --video_file will have no effect.
 -n, --model_name	|	Name of the model exported
+
+Options				|	Description
+---					|	---
+--use_spell_check	|	Decide whether to use spell check system for decoded transcripts from RNN. If option is given, spell correction system (KenLM) will be used.
 
 For running an exported model with default settings, run:
 ```bash

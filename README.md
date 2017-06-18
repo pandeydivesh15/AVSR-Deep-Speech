@@ -39,11 +39,11 @@ These steps require videos/audios and their associated time-aligned transcripts.
 
 Store time-aligned timescripts as json files. The json file should be of the format: [Click here](https://gist.github.com/pandeydivesh15/2012ab10562cc85e796e1f57554aca33).
 
-**Note**: By default, the project assumes that all .mp4(video) files are kept at [data/RHL_mp4](./data/RHL_mp4), json files at [data/RHL_json](./data/RHL_json) and all wav files at [data/RHL_wav](./data/RHL_wav). If you would like to change the defaults, change the associated variables at [bin/preprocess_data.py](./bin/preprocess_data.py).
+**Note**: By default, the project assumes that all .mp4(video) files are kept at [data/RHL_mp4](./data/RHL_mp4), json files at [data/RHL_json](./data/RHL_json) and all wav files at [data/RHL_wav](./data/RHL_wav). If you would like to change the defaults, change the associated variables at [bin/preprocess_data_audio.py](./bin/preprocess_data_audio.py).
 
 ### Audio-only Speech Recognition
 
-[bin/preprocess_data.py](./bin/preprocess_data.py) expects 5 positional arguments.
+[bin/preprocess_data_audio.py](./bin/preprocess_data_audio.py) expects 5 positional arguments.
 
 Argument			|	Description 
 ---					|	---
@@ -54,7 +54,7 @@ train_split			|	A float value for deciding percentage of data split for training
 dev_split			|	A float value for deciding percentage of validation data
 test_split			|	A float value for deciding percentage of test data
 
-Have a look at [bin/preprocess_audio.sh](./bin/preprocess_audio.sh), for a sample usage. This script runs [bin/preprocess_data.py](./bin/preprocess_data.py) with default storage locations and default data split percentages. 
+Have a look at [bin/preprocess_audio.sh](./bin/preprocess_audio.sh), for a sample usage. This script runs [bin/preprocess_data_audio.py](./bin/preprocess_data_audio.py) with default storage locations and default data split percentages. 
 
 From the main project's directory, open terminal and type:
 
@@ -110,7 +110,7 @@ Be aware however that checkpoints are only valid for the same model geometry the
 
 If the `--export_dir` parameter is provided to DeepSpeech_RHL.py, a model will have been exported to this directory during training. This exported model can then be used for predicting transcripts for new audio/video files.
 
-For running an exported model for new inputs, see [run_exported_model.py](./bin/run_exported_model.py). This python script allows four optional arguments.
+For running an exported model for new inputs, see [run_exported_model_audio.py](./bin/run_exported_model_audio.py). This python script allows four optional arguments.
 
 Argument			|	Description 
 ---					|	---
@@ -126,7 +126,7 @@ Options				|	Description
 
 For running an exported model with default settings, run:
 ```bash
-$ python ./bin/run_exported_model.py
+$ python ./bin/run_exported_model_audio.py
 ```
 This script, by default, runs on data/ldc93s1/LDC93S1.wav file. In case you dont have LDC93S1 dataset downloaded, run:
 ```bash

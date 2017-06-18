@@ -22,7 +22,7 @@ if [ ! -d data/clean_data/test ]; then
     mkdir data/clean_data/test
 fi;
 
-python ./bin/preprocess_data.py \
+python ./bin/preprocess_data_audio.py \
 	data/clean_data/train/ \
 	data/clean_data/dev/ \
 	data/clean_data/test/ \

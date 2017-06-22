@@ -4,6 +4,7 @@ import json
 import os
 import pandas
 import subprocess
+import random
 
 # Minimum length of split .wav file
 WAV_FILE_MIN_LEN = 2.00 # in seconds
@@ -141,16 +142,22 @@ def split_aligned_audio(audio_dir, json_dir	, output_dir_train, output_dir_dev,
 		split_info.append(find_text_and_time_limits(data))
 		total_audio_files += len(split_info[-1])
 
-	# TODO: Use a better way to split audios between train, dev, and test directories. Bring randomness
-	# Find proper limits according to args `train_split`, `dev_split`, `test_split`
 	dev_limit_start = int(train_split * total_audio_files)
 	dev_limit_end = dev_limit_start + int(dev_split * total_audio_files)
 
 	split_file_count = 0 # Counts number of split files.
+	# Hence helps in data split between train/dev/test dir.
 
-	for file_path, info in zip(json_file_names, split_info):
+	# Brings randomness in data --> shuffles all original audio filenamess and associated info  
+	shuffled_data = zip(json_file_names, split_info)
+	random.shuffle(shuffled_data)
+
+	for file_path, info in shuffled_data:
 		audio_file_name = file_path.split('/')[-1].split('.')[0]
 		audio_file_path = audio_dir + audio_file_name + '.wav'
+
+		# Brings randomness in data --> shuffles split info data for each original audio
+		random.shuffle(info)
 
 		for data, i  in zip(info, range(len(info))):
 			# Set output directory either equal to train or test or dev

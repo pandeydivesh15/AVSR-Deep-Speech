@@ -20,6 +20,9 @@ python -u DeepSpeech_RHL.py \
   --test_batch_size 10 \
   --n_hidden 494 \
   --epoch 50 \
+  --dropout_rate 0.10 \
+  --validation_step 5 \
+  --display_step 5 \
   --checkpoint_dir "$checkpoint_dir" \
   --export_dir data/export/
   "$@"

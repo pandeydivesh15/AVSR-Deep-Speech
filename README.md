@@ -41,7 +41,7 @@ Store time-aligned timescripts as json files. The json file should be of the for
 
 **Note**: By default, the project assumes that all .mp4(video) files are kept at [data/RHL_mp4](./data/RHL_mp4), json files at [data/RHL_json](./data/RHL_json) and all wav files at [data/RHL_wav](./data/RHL_wav). If you would like to change the defaults, change the associated variables at [bin/preprocess_data_audio.py](./bin/preprocess_data_audio.py).
 
-### Audio-only Speech Recognition
+#### Audio-only Speech Recognition
 
 [bin/preprocess_data_audio.py](./bin/preprocess_data_audio.py) expects 5 positional arguments.
 
@@ -105,6 +105,21 @@ Feel free to modify any of the above scripts for your use.
 During training of a model so called checkpoints will get stored on disk. This takes place at a configurable time interval. The purpose of checkpoints is to allow interruption (also in case of some unexpected failure) and later continuation of training without loosing hours of training time. Resuming from checkpoints happens automatically by just (re)starting training with the same `--checkpoint_dir` of the former run.
 
 Be aware however that checkpoints are only valid for the same model geometry they had been generated from. In other words: If there are error messages of certain `Tensors` having incompatible dimensions, this is most likely due to an incompatible model change. One usual way out would be to wipe all checkpoint files in the checkpoint directory or changing it before starting the training. 
+
+## Some Training Results
+
+#### Audio-only Speech Recognition
+
+Here are some of the results I obtained while running the code at [CWRU HPC](https://sites.google.com/a/case.edu/hpc-upgraded-cluster/). These results are based on a one hour long audio file. The file was split into 634 .wav files (See Data-Preprocessing). 90% files were used for training and 5% each for validation and testing.
+
+* Variable Dropouts for feedforward layers
+
+	dropout_rate		|	WER			|	Loss			|	Mean Edit Distance
+	---					|	:---:		| 	:---:			|	:---:
+	0.05, epoch = 50	|				|					|
+	0.05, epoch = 60	|				|					|
+	0.10, epoch = 50	|				|					| 		
+	0.10, epoch = 60	|				|					|	
 
 ## Exporting model and Testing
 

@@ -61,8 +61,8 @@ transcripts = model.find_transcripts(wav_file_paths)
 # Each string is the transcript for the corresponding .wav file in `wav_file_paths`.
 print transcripts
 
-# Delete temporary audio file, if --video_file was given (other args will not be given)
-if (not args.wav_dir) and (not args.wav_file):
+# Delete temporary audio file, if --video_file was given
+if args.video_file:
 	os.remove(temp_file_path)
 
 # Close tensorflow session

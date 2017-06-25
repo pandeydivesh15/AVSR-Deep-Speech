@@ -110,16 +110,21 @@ Be aware however that checkpoints are only valid for the same model geometry the
 
 #### Audio-only Speech Recognition
 
-Here are some of the results I obtained while running the code at [CWRU HPC](https://sites.google.com/a/case.edu/hpc-upgraded-cluster/). These results are based on a one hour long audio file. The file was split into 634 .wav files (See Data-Preprocessing). 90% files were used for training and 5% each for validation and testing.
+Here are some of the results I obtained while running the code at [CWRU HPC](https://sites.google.com/a/case.edu/hpc-upgraded-cluster/). The script [bin/run_case_HPC.sh](./bin/run_case_HPC.sh) was used to get these results.
+
+These results are based on a **one hour** long audio file. The file was split into 634 .wav files (See Data-Preprocessing). 90% files were used for training and 5% each for validation and testing.
 
 * Variable Dropouts for feedforward layers
 
-	dropout_rate		|	WER			|	Loss			|	Mean Edit Distance
-	---					|	:---:		| 	:---:			|	:---:
-	0.05, epoch = 50	|				|					|
-	0.05, epoch = 60	|				|					|
-	0.10, epoch = 50	|				|					| 		
-	0.10, epoch = 60	|				|					|	
+	**dropout_rate = 0.05**
+
+	<img align = 'left' src="./Images/training_loss_drop05" width='50%' height='50%'> <img align="right" src="./Images/training_WER_drop05" width='50%' height='50%'>
+
+	**dropout_rate = 0.10**
+
+	<img align = 'left' src="./Images/training_loss_drop10" width='50%' height='50%'> <img align="right" src="./Images/training_WER_drop10" width='50%' height='50%'>
+
+
 
 ## Exporting model and Testing
 

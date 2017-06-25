@@ -118,13 +118,11 @@ These results are based on a **one hour** long audio file. The file was split in
 
 	**dropout_rate = 0.05**
 
-	<img align = 'left' src="./Images/training_loss_drop05" width='50%' height='50%'> <img align="right" src="./Images/training_WER_drop05" width='50%' height='50%'>
+	<img align = "left" src="./Images/training_loss_drop05" width='45%' height='50%'> <img float ="right" src="./Images/training_WER_drop05" width='45%' height='50%'>
 
 	**dropout_rate = 0.10**
 
-	<img align = 'left' src="./Images/training_loss_drop10" width='50%' height='50%'> <img align="right" src="./Images/training_WER_drop10" width='50%' height='50%'>
-
-
+	<img align = 'left' src="./Images/training_loss_drop10" width='45%' height='50%'> <img float="right" src="./Images/training_WER_drop10" width='45%' height='50%'>
 
 ## Exporting model and Testing
 

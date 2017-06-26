@@ -112,7 +112,7 @@ Be aware however that checkpoints are only valid for the same model geometry the
 
 Here are some of the results I obtained while running the code at [CWRU HPC](https://sites.google.com/a/case.edu/hpc-upgraded-cluster/). The script [bin/run_case_HPC.sh](./bin/run_case_HPC.sh) was used to get these results.
 
-These results are based on a **one hour** long audio file. The file was split into 634 .wav files (See Data-Preprocessing). 90% files were used for training and 5% each for validation and testing.
+These results are based on a **one hour** long audio file. The file was split into 634 .wav files (See [Data-Preprocessing](#data-preprocessing-for-training)). 90% files were used for training and 5% each for validation and testing.
 
 * Variable Dropouts for feedforward layers
 
@@ -146,14 +146,28 @@ Options				|	Description
 ---					|	---
 --use_spell_check	|	Decide whether to use spell check system for decoded transcripts from RNN. If option is given, spell correction system (KenLM) will be used.
 
-For running an exported model with default settings, run:
-```bash
-$ python ./bin/run_exported_model_audio.py
-```
-This script, by default, runs on data/ldc93s1/LDC93S1.wav file. In case you dont have LDC93S1 dataset downloaded, run:
-```bash
-$ python -u bin/import_ldc93s1.py ./data/ldc93s1 
-```
+* For running an exported model with default settings, run:
+
+	```bash
+	$ python ./bin/run_exported_model_audio.py
+	```
+
+	Note: This script, by default, runs on data/ldc93s1/LDC93S1.wav file. In case you dont have LDC93S1 dataset downloaded, run: ```$ python -u bin/import_ldc93s1.py ./data/ldc93s1```
+
+* Using command line options for running exported model:
+
+	```bash
+	$ python ./bin/run_exported_model_audio.py -d path_to_exported_model/ -n model_name -af /path_to_wav_file/file.wav 
+
+	# This finds transcript for given audio .wav file.
+	```
+
+	```bash
+	$ python ./bin/run_exported_model_audio.py -d path_to_exported_model/ -n model_name -vf /path_to_video_file/file.mp4 
+
+	# This finds transcript for given video file.
+	```
+
 
 ## Acknowledgments
 

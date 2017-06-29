@@ -8,6 +8,7 @@ import random
 
 # Minimum length of split .wav file
 WAV_FILE_MIN_LEN = 2.00 # in seconds
+WAV_FILE_MAX_LEN = 10.00 # in seconds
 
 def convert_mp4(video_dir, audio_dir):
 	'''
@@ -36,17 +37,19 @@ def read_json_file(file_path):
 	Returns:
 		data:	A list of dicts. Each dict contains timing info for a spoken word(or punctuation).
 	'''
-	data = []
+
 	with open(file_path, 'r') as f:
-		for line in f:
-			temp = json.loads(line)
-			temp['start'] = None if temp['start'] == 'NA' else float(temp['start'])
-			temp['end'] = None if temp['end'] == 'NA' else float(temp['end'])
-			try:
-				temp['word'] = temp['word'].encode('ascii')
-			except KeyError:
-				temp['punctuation'] = temp['punctuation'].encode('ascii')				
-			data.append(temp)
+		data = json.loads(f.read())['words']
+
+		# for line in f:
+		# 	temp = json.loads(line)
+		# 	temp['start'] = None if temp['start'] == 'NA' else float(temp['start'])
+		# 	temp['end'] = None if temp['end'] == 'NA' else float(temp['end'])
+		# 	try:
+		# 		temp['word'] = temp['word'].encode('ascii')
+		# 	except KeyError:
+		# 		temp['punctuation'] = temp['punctuation'].encode('ascii')				
+		# 	data.append(temp)
 
 	return data
 
@@ -66,24 +69,42 @@ def find_text_and_time_limits(alignment_data):
 
 	data = []
 	# 'data' will hold tuples of the form (x, (y, z))
-	split_time_start = 0.00
+
+	# Determine starting time position for splitting main file
+	count = 0 # Counts no. of initial values to skip in `alignment_data`
+	for word_dict in alignment_data:
+		if word_dict.has_key('start'):
+			split_time_start = word_dict['start']
+			break
+		count += 1
+
 	transcript  = ""
 
-	for word_dict in alignment_data:
-		if word_dict['end'] is None:
-			if word_dict.has_key('word'):
-				transcript += " " + word_dict['word']
+	# TODO: Find a way to get rid of three try and except statements.
+
+	for word_dict in alignment_data[count:]:
+		if word_dict['case'] == "not-found-in-audio":
+			try:
+				transcript += " " + word_dict['word'].encode('ascii')			
+			except Exception:
+				pass
 			continue
 		if word_dict['end'] - split_time_start >= WAV_FILE_MIN_LEN:
-			if word_dict.has_key("punctuation"):
-				data.append((transcript.lower().strip(), (split_time_start, word_dict['end'])))
-				transcript = ""
-				split_time_start = word_dict['end']
-			else:
-				transcript += " " + word_dict['word']
+			try:
+				transcript += " " + word_dict['word'].encode('ascii')			
+			except Exception:
+				pass
+			data.append(
+				(transcript.lower().strip(),
+				(split_time_start, word_dict['end'])))
+
+			transcript = ""
+			split_time_start = word_dict['end']				
 		else:
-			if word_dict.has_key('word'):
-				transcript += " " + word_dict['word']
+			try:
+				transcript += " " + word_dict['word'].encode('ascii')			
+			except Exception:
+				pass
 	return data
 
 def split(split_file_path, main_file_path, transcript_path, split_info):
@@ -136,7 +157,8 @@ def split_aligned_audio(audio_dir, json_dir	, output_dir_train, output_dir_dev,
 	total_audio_files = 0 # denotes total wav files we will get after splitting
 
 	# Get all json files' paths, and calculate splitting info from each json file.
-	json_file_names = sorted(glob.glob(json_dir + "*.json?"))
+	json_file_names = sorted(glob.glob(json_dir + "*.json"))
+	
 	for file_path in json_file_names:
 		data = read_json_file(file_path)
 		split_info.append(find_text_and_time_limits(data))

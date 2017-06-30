@@ -8,7 +8,7 @@ import random
 
 # Minimum length of split .wav file
 WAV_FILE_MIN_LEN = 2.00 # in seconds
-WAV_FILE_MAX_LEN = 10.00 # in seconds
+WAV_FILE_MAX_LEN = 5.00 # in seconds
 
 def convert_mp4(video_dir, audio_dir):
 	'''
@@ -94,9 +94,12 @@ def find_text_and_time_limits(alignment_data):
 				transcript += " " + word_dict['word'].encode('ascii')			
 			except Exception:
 				pass
-			data.append(
-				(transcript.lower().strip(),
-				(split_time_start, word_dict['end'])))
+
+			# We will ignore the split file if it has length > `WAV_FILE_MAX_LEN`
+			if word_dict['end'] - split_time_start <= WAV_FILE_MAX_LEN:
+				data.append(
+					(transcript.lower().strip(),
+					(split_time_start, word_dict['end'])))
 
 			transcript = ""
 			split_time_start = word_dict['end']				

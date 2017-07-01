@@ -12,18 +12,27 @@ This project is based on the approach discussed in paper [Deep Speech](https://a
 
 ### Prerequisites
 
-* [Git Large File Storage](https://git-lfs.github.com/)
-* [TensorFlow 1.0 or above](https://www.tensorflow.org/install/)
-* [SciPy](https://scipy.org/install.html)
-* [PyXDG](https://pypi.python.org/pypi/pyxdg)
-* [python_speech_features](https://pypi.python.org/pypi/python_speech_features)
-* [python sox](https://pypi.python.org/pypi/sox)
-* [pandas](https://pypi.python.org/pypi/pandas#downloads)
-* [FFmpeg](https://www.ffmpeg.org/download.html)
+* **For Audio-only Speech Recognition**:
+	* [Git Large File Storage](https://git-lfs.github.com/)
+	* [TensorFlow 1.0 or above](https://www.tensorflow.org/install/)
+	* [SciPy](https://scipy.org/install.html)
+	* [PyXDG](https://pypi.python.org/pypi/pyxdg)
+	* [python_speech_features](https://pypi.python.org/pypi/python_speech_features)
+	* [python sox](https://pypi.python.org/pypi/sox)
+	* [pandas](https://pypi.python.org/pypi/pandas#downloads)
+	* [FFmpeg](https://www.ffmpeg.org/download.html)
+
+* **For Audio-Visual Speech Recognition**:
+
+	In addition to above requirements, you will also require:
+	* [OpenCV 3.x for Python](http://docs.opencv.org/trunk/d7/d9f/tutorial_linux_install.html)
+	* [scikit-image](http://scikit-image.org/download.html)
+	* [Dlib for Python](http://www.pyimagesearch.com/2017/03/27/how-to-install-dlib/)
 
 ### Installing
 
-* Firstly, install [Git Large File Storage(LFS) Support](https://git-lfs.github.com/) and [FFmpeg](https://www.ffmpeg.org/download.html).
+* Firstly, install [Git Large File Storage(LFS) Support](https://git-lfs.github.com/), [FFmpeg](https://www.ffmpeg.org/download.html).
+* For video based speech recognition (Lip reading), you will also require OpenCV 3.x(http://docs.opencv.org/trunk/d7/d9f/tutorial_linux_install.html) and dlib(http://www.pyimagesearch.com/2017/03/27/how-to-install-dlib/) for python. 
 * Open terminal and type following commands.
 ```bash
 $ git clone https://github.com/pandeydivesh15/AVSR-Deep-Speech.git
@@ -175,19 +184,3 @@ Options				|	Description
 * [Red Hen Lab](http://www.redhenlab.org/)
 * [Mozilla's DeepSpeech](https://github.com/mozilla/DeepSpeech)
 * [Deep Speech Paper](https://arxiv.org/abs/1412.5567)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

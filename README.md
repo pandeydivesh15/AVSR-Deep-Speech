@@ -31,14 +31,14 @@ This project is based on the approach discussed in paper [Deep Speech](https://a
 
 ### Installing
 
-* Firstly, install [Git Large File Storage(LFS) Support](https://git-lfs.github.com/), [FFmpeg](https://www.ffmpeg.org/download.html).
-* For video based speech recognition (Lip reading), you will also require OpenCV 3.x(http://docs.opencv.org/trunk/d7/d9f/tutorial_linux_install.html) and dlib(http://www.pyimagesearch.com/2017/03/27/how-to-install-dlib/) for python. 
+* Firstly, install [Git Large File Storage(LFS) Support](https://git-lfs.github.com/) and [FFmpeg](https://www.ffmpeg.org/download.html).
+* For video based speech recognition (lip reading), you will also require [OpenCV 3.x](http://docs.opencv.org/trunk/d7/d9f/tutorial_linux_install.html) and [dlib](http://www.pyimagesearch.com/2017/03/27/how-to-install-dlib/) for python. 
 * Open terminal and type following commands.
-```bash
-$ git clone https://github.com/pandeydivesh15/AVSR-Deep-Speech.git
-$ cd AVSR-Deep-Speech
-$ pip install -r requirements.txt 
-```
+	```bash
+	$ git clone https://github.com/pandeydivesh15/AVSR-Deep-Speech.git
+	$ cd AVSR-Deep-Speech
+	$ pip install -r requirements.txt 
+	```
 
 ## Data-Preprocessing for Training
 

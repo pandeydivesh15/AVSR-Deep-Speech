@@ -173,34 +173,36 @@ def split_aligned_audio(audio_dir, json_dir	, output_dir_train, output_dir_dev,
 	split_file_count = 0 # Counts number of split files.
 	# Hence helps in data split between train/dev/test dir.
 
-	# Brings randomness in data --> shuffles all original audio filenamess and associated info  
-	shuffled_data = zip(json_file_names, split_info)
-	random.shuffle(shuffled_data)
+	shuffled_data = [] 
+	# `shuffled_data` stores randomly shuffled information for file splitting.
 
-	for file_path, info in shuffled_data:
+	for file_path, info in zip(json_file_names, split_info):
 		audio_file_name = file_path.split('/')[-1].split('.')[0]
 		audio_file_path = audio_dir + audio_file_name + '.wav'
 
-		# Brings randomness in data --> shuffles split info data for each original audio
-		random.shuffle(info)
-
 		for data, i  in zip(info, range(len(info))):
-			# Set output directory either equal to train or test or dev
-			# Decided by args `train_split`, `dev_split`, `test_split`
-			if split_file_count < dev_limit_start:
-				output_dir = output_dir_train
-			elif split_file_count < dev_limit_end:
-				output_dir = output_dir_dev
-			else:
-				output_dir = output_dir_test
+			shuffled_data.append(
+				(data, i, audio_file_name, audio_file_path))
 
-			# Generate file paths for transcript and split .wav file.
-			split_file_path = output_dir + audio_file_name + str(i).zfill(5) + ".wav"
-			transcript_file_path = output_dir + audio_file_name + str(i).zfill(5) + ".txt"
+	random.shuffle(shuffled_data) # shuffling information
 
-			# Split the main file
-			split(split_file_path, audio_file_path, transcript_file_path, data)
-			split_file_count += 1
+	for data in shuffled_data:
+		# Set output directory either equal to train or test or dev
+		# Decided by args `train_split`, `dev_split`, `test_split`
+		if split_file_count < dev_limit_start:
+			output_dir = output_dir_train
+		elif split_file_count < dev_limit_end:
+			output_dir = output_dir_dev
+		else:
+			output_dir = output_dir_test
+
+		# Generate file paths for transcript and split .wav file.
+		split_file_path = output_dir + data[2] + str(data[1]).zfill(5) + ".wav"
+		transcript_file_path = output_dir + data[2] + str(data[1]).zfill(5) + ".txt"
+
+		# Split the main file
+		split(split_file_path, data[3], transcript_file_path, data[0])
+		split_file_count += 1
 
 
 def create_csv(data_dir):

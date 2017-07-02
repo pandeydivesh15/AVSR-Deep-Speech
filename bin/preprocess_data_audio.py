@@ -36,6 +36,7 @@ if args.train_split + args.dev_split + args.test_split != 1.0:
 
 # Convert any mp4 found in data/RHL_mp4/ and store it in data/RHL_wav/
 data_preprocessing.convert_mp4(video_dir, audio_dir)
+print "[INFO]: Main video files converted to .wav files. Now splitting starts."
 
 # Split all big wav files at data/RHL_wav/ and stores them at proper locations.(data/clean_data/ by default)
 data_preprocessing.split_aligned_audio(audio_dir, 
@@ -46,9 +47,10 @@ data_preprocessing.split_aligned_audio(audio_dir,
 									   args.train_split,
 									   args.dev_split,
 									   args.test_split)
+print "[INFO]: Train/Dev/Test .wav files generated. Now creating CSVs."
 
 # Create CSVs out of all split wav files.
 data_preprocessing.create_csv(args.output_dir_train)
 data_preprocessing.create_csv(args.output_dir_dev)
 data_preprocessing.create_csv(args.output_dir_test)
-
+print "[INFO]: CSV files generated at train/ dev/ test/ locations. Exiting."

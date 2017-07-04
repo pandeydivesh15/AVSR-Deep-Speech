@@ -21,14 +21,12 @@ def load_trained_models():
 	LANDMARKS_PREDICTOR = dlib.shape_predictor("data/dlib_data/shape_predictor_68_face_landmarks.dat")
 
 def resize(image, width, height=None):
-	if height:
-		dim = (width, height)
-	else:
-		h,w,channels = image.shape
+	h,w,channels = image.shape
+	if not height:
 		ratio = float(width) / w
-		dim = (width, int(ratio*h))
+		height = int(ratio*h)
 
-	resized = cv2.resize(image, dim)
+	resized = cv2.resize(image, (width, height))
 	return resized
 
 def get_mouth_coord(landmarks):
@@ -56,9 +54,13 @@ def crop_and_store(frame, mouth_coordinates, name):
 
 	mouth_roi = frame[y:y + h, x:x + w]
 
+	h, w, channels = mouth_roi.shape
+	# If the cropped region is very small, ignore this case.
+	if h < 10 or w < 10:
+		return
+	
 	resized = resize(mouth_roi, 32, 32)
 	cv2.imwrite(name, resized)
-
 
 def extract_mouth_regions(path, output_dir, screen_display):
 	video_name = path.split('/')[-1].split(".")[0]

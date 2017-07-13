@@ -73,6 +73,31 @@ $ ./bin/preprocess_audio.sh
 
 After this step, all prepared data files(train, dev, test) will be stored in data/clean_data folder.
 
+#### Audio Visual Speech Recognition (AVSR)
+
+##### Preparing data for training AutoEncoder
+
+[bin/preprocess_auto_enc.py](./bin/preprocess_auto_enc.py) expects 2 necessary positional args and 2 optional args.
+
+Pos. Arguments		|	Description
+---					|	---
+video_dir			|	Output dir for storing training files (with trailing slash)
+output_dir			|	Output dir for storing files for validation (with trailing slash)
+
+Optional 			|	Description
+---					|	---
+--max_videos n		|	`n` = number of videos to be used for preprocessing. (Default = 1)
+--screen_display	|	Determines whether to display the video being processed.
+
+Have a look at [bin/preprocessing_AE.sh](./bin/preprocessing_AE.sh). This script runs [bin/preprocessing_AE.sh](./bin/preprocessing_AE.sh) with default values. 
+
+From the main project's directory, open terminal and type:
+
+```bash
+$ ./bin/preprocessing_AE.sh
+```
+
+
 ## Training
 
 #### Original DeepSpeech
@@ -184,3 +209,6 @@ Options				|	Description
 * [Red Hen Lab](http://www.redhenlab.org/)
 * [Mozilla's DeepSpeech](https://github.com/mozilla/DeepSpeech)
 * [Deep Speech Paper](https://arxiv.org/abs/1412.5567)
+* [Deep complementary bottleneck features for visual speech recognition](https://ibug.doc.ic.ac.uk/media/uploads/documents/petridispantic_icassp2016.pdf)
+* [Reducing the Dimensionality of Data with Neural Networks](https://www.cs.toronto.edu/~hinton/science.pdf)
+* [rbm-ae-tf](https://github.com/Cospel/rbm-ae-tf)

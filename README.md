@@ -211,4 +211,4 @@ Options				|	Description
 * [Deep Speech Paper](https://arxiv.org/abs/1412.5567)
 * [Deep complementary bottleneck features for visual speech recognition](https://ibug.doc.ic.ac.uk/media/uploads/documents/petridispantic_icassp2016.pdf)
 * [Reducing the Dimensionality of Data with Neural Networks](https://www.cs.toronto.edu/~hinton/science.pdf)
-* [rbm-ae-tf](https://github.com/Cospel/rbm-ae-tf)
+* [rbm-ae-tf](https://github.com/Cospel/rbm-ae-tf), [tensorfow-rbm](https://github.com/meownoid/tensorfow-rbm)

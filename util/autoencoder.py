@@ -1,5 +1,8 @@
 import tensorflow as tf
 import numpy as np
+import time 
+
+from tqdm import tqdm
 
 from util.RBM.util import tf_xavier_init
 
@@ -91,12 +94,39 @@ class AutoEncoder:
 		return cost
 
 	def fit(self, 
-			data_x,
-            n_epoches=10,
-            batch_size=10,
-            shuffle=True,
-            use_tqdm=False):
-		pass
+			data_x_train,
+			data_x_dev=None,
+			data_x_test=None,
+			n_epochs=10,
+			batch_size=10):
+		assert n_epochs > 0
+		assert batch_size < data_x_train.shape[0]
+
+		size_x_train = data_x_train.shape[0]
+
+		n_batches = size_x_train / batch_size
+		
+		for e in range(n_epochs):
+			epoch_costs = np.zeros(n_batches)
+			bar = tqdm(range(n_batches), desc='Epoch: {:d}'.format(e))
+
+			for i in bar:
+				batch_x = data_x_train[i*batch_size:(i+1)*batch_size]
+				err = self.partial_fit(batch_x)
+				epoch_costs[i] = err
+
+			mean_cost = epoch_costs.mean()
+			print 'Train error: {:.4f}'.format(mean_cost)
+
+			if data_x_dev is not None:
+				random_indices = np.random.randint(0, data_x_dev.shape[0], batch_size)
+				batch_x = data_x_dev[random_indices]
+				err = self.partial_fit(batch_x)
+				print 'Validation data error: {:.4f}'.format(err)
+
+		if data_x_test is not None:
+				err = self.partial_fit(data_x_test)
+				print 'Test data error: {:.4f}'.format(err)
 
 	def load_rbm_weights(self, path, layer_names):
 		assert layer_names == self.layer_names

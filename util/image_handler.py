@@ -2,9 +2,8 @@ import random
 import glob
 
 import numpy as np
-from scipy.ndimage import imread
 import cv2
-import matplotlib.pyplot as plt
+from scipy.ndimage import imread
 
 IMAGE_WIDTH = IMAGE_HEIGHT = 32
 
@@ -13,7 +12,11 @@ def visualize_image(image, rescale = True):
 		image = np.multiply(image, 255.0)
 	image = image.reshape([IMAGE_WIDTH, IMAGE_HEIGHT])
 	
-	# Implementation left
+	image = image.astype(np.uint8)
+
+	cv2.imshow("Image", image)
+	if cv2.waitKey(0) & 0xFF == ord('q'):
+		cv2.destroyAllWindows()
 
 
 class ImageDataSet():

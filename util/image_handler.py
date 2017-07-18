@@ -7,16 +7,20 @@ from scipy.ndimage import imread
 
 IMAGE_WIDTH = IMAGE_HEIGHT = 32
 
-def visualize_image(image, rescale = True):
-	if rescale: 
-		image = np.multiply(image, 255.0)
+def visualize_image(image, resize=False, save_image=False, path=None):
 	image = image.reshape([IMAGE_WIDTH, IMAGE_HEIGHT])
-	
 	image = image.astype(np.uint8)
+
+	if resize: 
+		image = cv2.resize(image, (IMAGE_WIDTH * 10, IMAGE_HEIGHT * 10))
 
 	cv2.imshow("Image", image)
 	if cv2.waitKey(0) & 0xFF == ord('q'):
 		cv2.destroyAllWindows()
+
+	if save_image:
+		assert path is not None
+		cv2.imwrite(path, image)
 
 
 class ImageDataSet():
@@ -25,18 +29,14 @@ class ImageDataSet():
 	In this project, we will be working with mouth region images.
 	"""
 
-	def __init__(self, image_dir, normalize=True):
+	def __init__(self, image_dir):
 		self.image_dir = image_dir
 
 		self.train = None
 		self.dev = None
 		self.test = None
 
-		self.normalize = normalize 
-		# If true: We scale data to have mean = 0, std_dev = 1
-		# Standard normally distributed data: Gaussian with zero mean and unit variance.
-
-	def read_data(self, train_split=0.80, dev_split=0.10, test_split=0.10, ):
+	def read_data(self, train_split=0.80, dev_split=0.10, test_split=0.10):
 		assert (train_split + dev_split + test_split == 1.0)
 
 		all_images = glob.glob(self.image_dir + "*.png")
@@ -45,17 +45,13 @@ class ImageDataSet():
 		for image_path in all_images:
 			image = imread(image_path, flatten=True)
 			image = image.reshape(IMAGE_WIDTH*IMAGE_HEIGHT)
-			image = np.multiply(image, 1.0 / 255.0)
-
-			if self.normalize:
-				mean = np.mean(image)
-				std_dev = np.std(image)
-				image = (image - mean) / std_dev
+			# image = np.multiply(image, 1.0 / 255.0) No scaling here
 
 			data.append(image)
 
 		random.shuffle(data)
 		data = np.array(data)
+		data = data.astype(np.uint8)
 
 		total_images = data.shape[0]
 

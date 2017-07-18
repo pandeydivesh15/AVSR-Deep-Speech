@@ -16,7 +16,8 @@ data/clean_data
 # Folder storing processed data for auto-encoder training.
 data/AE_clean_data
 
-
+# Folder for storing learnt parameters for autoencoder and RBMs
+data/AE_and_RBM_model_saves
 
 
 

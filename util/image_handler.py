@@ -49,7 +49,6 @@ class ImageDataSet():
 
 			data.append(image)
 
-		random.shuffle(data)
 		data = np.array(data)
 		data = data.astype(np.uint8)
 
@@ -61,6 +60,9 @@ class ImageDataSet():
 		self.train = data[:train_limit]
 		self.dev = data[train_limit:dev_limit]
 		self.test = data[dev_limit:]
+
+		# Only shuffling training data.
+		random.shuffle(self.train)
 
 		self.data_dict = {
 			'train':	self.train,

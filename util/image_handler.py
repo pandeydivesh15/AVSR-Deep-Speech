@@ -7,14 +7,14 @@ from scipy.ndimage import imread
 
 IMAGE_WIDTH = IMAGE_HEIGHT = 32
 
-def visualize_image(image, resize=False, save_image=False, path=None):
+def visualize_image(image, name="Image", resize=False, save_image=False, path=None):
 	image = image.reshape([IMAGE_WIDTH, IMAGE_HEIGHT])
 	image = image.astype(np.uint8)
 
 	if resize: 
 		image = cv2.resize(image, (IMAGE_WIDTH * 10, IMAGE_HEIGHT * 10))
 
-	cv2.imshow("Image", image)
+	cv2.imshow(name, image)
 	if cv2.waitKey(0) & 0xFF == ord('q'):
 		cv2.destroyAllWindows()
 

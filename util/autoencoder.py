@@ -50,8 +50,7 @@ class AutoEncoder:
 			input_dim = int(next_layer_input.get_shape()[1])
 			layer_dim = self.decoding_layer_sizes[i]
 
-			# Take transpose of previous encoding layer's weights.
-			W = tf.identity(tf.transpose(reversed_encoding_weights[i]))
+			W = tf.Variable(tf_xavier_init(input_dim, layer_dim, const=4.0), name=layer_names[i][0]+'_d')
 
 			b = tf.Variable(tf.zeros([layer_dim]))
 
@@ -128,20 +127,18 @@ class AutoEncoder:
 				err = self.partial_fit(data_x_test)
 				print 'Test data error: {:.4f}'.format(err)
 
-	def load_rbm_weights(self, path, layer_names):
-		assert layer_names == self.layer_names
+	def load_rbm_weights(self, path, layer_index):
+		assert layer_index < len(self.layer_names)
 
 		data_dict = {}
-		for i in len(self.encoding_layer_sizes):
-			 data_dict[self.layer_names[i][0]] = self.encoding_weights[i]
-			 data_dict[self.layer_names[i][1]] = self.encoding_biases[i]
+		data_dict[self.layer_names[layer_index][0]] = self.encoding_weights[layer_index]
+		data_dict[self.layer_names[layer_index][1]] = self.encoding_biases[layer_index]
 
 		saver = tf.train.Saver(data_dict)
 		saver.restore(self.sess, path)
 
 		# Now, we must also load decoding weights.
-		for i in len(self.decoding_layer_sizes):
-			self.sess.run(self.decoding_weights[i].assign(tf.transpose(self.encoding_weights[i]))) 
+		self.sess.run(self.decoding_weights[layer_index].assign(tf.transpose(self.encoding_weights[layer_index]))) 
 
 	def map_layer_with_names(self):
 		self.layer_map = {}

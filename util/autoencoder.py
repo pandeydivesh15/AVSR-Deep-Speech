@@ -7,7 +7,7 @@ from tqdm import tqdm
 from util.RBM.util import tf_xavier_init
 
 class AutoEncoder:
-	def __init__(self, input_size, encoding_layer_sizes, layer_names):
+	def __init__(self, input_size, encoding_layer_sizes, layer_names, l2_coeff=0.005):
 		
 		assert len(encoding_layer_sizes) == len(layer_names)
 
@@ -70,7 +70,13 @@ class AutoEncoder:
 
 		# Computing Cost
 		self.cost = tf.sqrt(tf.reduce_mean(tf.square(self.x - self.reconstructed_x)))
-		self.optimizer = self.get_optimizer().minimize(self.cost)
+
+		# L2 Regularization
+		self.cost_ = self.cost	
+		for weights in self.encoding_weights:
+			self.cost_ += l2_coeff*tf.nn.l2_loss(weights)
+		self.cost_ = tf.reduce_mean(self.cost_)
+		self.optimizer = self.get_optimizer().minimize(self.cost_)
 
 		init = tf.global_variables_initializer()
 		self.sess = tf.Session()
@@ -86,10 +92,10 @@ class AutoEncoder:
 		return self.sess.run(self.reconstructed_x, feed_dict={self.x: batch_x})
 
 	def get_cost(self, batch_x):
-		return self.sess.run(self.cost, feed_dict={self.x: batch_x})
+		return self.sess.run(self.cost_, feed_dict={self.x: batch_x})
 
 	def partial_fit(self, batch_x):
-		cost, opt = self.sess.run((self.cost, self.optimizer), feed_dict={self.x: batch_x})
+		cost, opt = self.sess.run((self.cost_, self.optimizer), feed_dict={self.x: batch_x})
 		return cost
 
 	def fit(self, 
@@ -120,11 +126,11 @@ class AutoEncoder:
 			if data_x_dev is not None:
 				random_indices = np.random.randint(0, data_x_dev.shape[0], batch_size)
 				batch_x = data_x_dev[random_indices]
-				err = self.partial_fit(batch_x)
+				err = self.get_cost(batch_x)
 				print 'Validation data error: {:.4f}'.format(err)
 
 		if data_x_test is not None:
-				err = self.partial_fit(data_x_test)
+				err = self.get_cost(data_x_test)
 				print 'Test data error: {:.4f}'.format(err)
 
 	def load_rbm_weights(self, path, layer_index):

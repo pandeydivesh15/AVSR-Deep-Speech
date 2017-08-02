@@ -6,6 +6,7 @@ from threading import Thread
 from math import ceil
 from six.moves import range
 from util.audio import audiofile_to_input_vector
+from util.audio_video import get_audio_visual_feature_vector
 from util.gpu import get_available_gpus
 from util.text_RHL import ctc_label_dense_to_sparse, text_to_char_array
 
@@ -90,7 +91,11 @@ class DataSet(object):
 
     def _populate_batch_queue(self, session):
         for wav_file, transcript in self._indices():
-            source = audiofile_to_input_vector(wav_file, self._numcep, self._numcontext)
+            # Get file path for JSON file storing training data for visual speech recognition
+            json_file_path = wav_file.split('.')[0] + ".json"
+
+            # source = audiofile_to_input_vector(wav_file, self._numcep, self._numcontext)
+            source = get_audio_visual_feature_vector(wav_file, json_file_path, self._numcep, self._numcontext)
             source_len = len(source)
             target = text_to_char_array(transcript)
             target_len = len(target)

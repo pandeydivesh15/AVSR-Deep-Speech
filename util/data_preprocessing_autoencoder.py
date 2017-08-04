@@ -95,8 +95,8 @@ def extract_mouth_regions(path, output_dir, screen_display):
 		if screen_display:
 			visualize(frame, all_mouth_coordinates)			
 
-		if cv2.waitKey(1) & 0xFF == ord('q'):
-			break
+			if cv2.waitKey(1) & 0xFF == ord('q'):
+				break
 
 	stream.stop()
 	if screen_display:

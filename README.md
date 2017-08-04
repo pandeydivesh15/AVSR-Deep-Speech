@@ -8,6 +8,20 @@ Now, it is common for news videos to incorporate both auditory and visual modali
 
 This project is based on the approach discussed in paper [Deep Speech](https://arxiv.org/abs/1412.5567). This paper discusses speech recognition using audio modality only, hence this project can be seen as an extension to Deep Speech model.
 
+#### Contents
+
+1. [Getting Started](#getting-started)
+2. [Data-Preprocessing for Training](#data-preprocessing-for-training)
+	* [Audio-only Speech Recognition](#audio-only-speech-recognition)
+	* [Audio Visual Speech Recognition (AVSR)](#audio-visual-speech-recognition-avsr)
+		* [Preparing data for training Autoencoder](#preparing-data-for-training-autoencoder)
+		* [Preparing data for AVSR](#preparing-data-for-avsr)
+3. [Training](#training)
+4. [Checkpointing](#checkpointing)
+5. [Some Training Results](#some-training-results)
+6. [Exporting model and Testing](#exporting-model-and-testing)
+7. [Acknowledgments](#acknowledgments)
+
 ## Getting Started
 
 ### Prerequisites
@@ -75,7 +89,7 @@ After this step, all prepared data files(train, dev, test) will be stored in dat
 
 #### *Audio Visual Speech Recognition (AVSR)*
 
-##### Preparing data for training AutoEncoder
+##### Preparing data for training Autoencoder
 
 [bin/preprocess_auto_enc.py](./bin/preprocess_auto_enc.py) expects 2 necessary positional args and 2 optional args.
 

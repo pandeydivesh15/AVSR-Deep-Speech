@@ -50,7 +50,7 @@ Store time-aligned timescripts as json files. The json file should be of the for
 
 **Note**: By default, the project assumes that all .mp4(video) files are kept at [data/RHL_mp4](./data/RHL_mp4), json files at [data/RHL_json](./data/RHL_json) and all wav files at [data/RHL_wav](./data/RHL_wav). If you would like to change the defaults, change the associated variables at [bin/preprocess_data_audio.py](./bin/preprocess_data_audio.py).
 
-#### Audio-only Speech Recognition
+#### *Audio-only Speech Recognition*
 
 [bin/preprocess_data_audio.py](./bin/preprocess_data_audio.py) expects 5 positional arguments.
 
@@ -73,7 +73,7 @@ $ ./bin/preprocess_audio.sh
 
 After this step, all prepared data files(train, dev, test) will be stored in data/clean_data folder.
 
-#### Audio Visual Speech Recognition (AVSR)
+#### *Audio Visual Speech Recognition (AVSR)*
 
 ##### Preparing data for training AutoEncoder
 
@@ -97,6 +97,16 @@ From the main project's directory, open terminal and type:
 $ ./bin/preprocessing_AE.sh
 ```
 
+##### Preparing data for AVSR
+
+Command line arguments for [bin/preprocess_audio_video.py](./bin/preprocess_audio_video.py) are [same as in the case of audio-only speech recognition](#audio-only-speech-recognition). Have a look at [bin/preprocess_AVSR.sh](./bin/preprocess_AVSR.sh) for example usage.
+Open terminal and change directory to main project's directory. Type:
+
+```bash
+$ ./bin/preprocess_AVSR.sh
+```
+
+After this step, there will be three kinds of file formats for each file name. For e.g. if file's name is 'xyz', there will be 'xyz.wav'(containing actual audio), 'xyz.json'(containing visual features), and 'xyz.txt'(transcript).
 
 ## Training
 

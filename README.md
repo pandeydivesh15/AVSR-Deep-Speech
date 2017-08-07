@@ -195,7 +195,6 @@ For running an exported model for new inputs, see [run_exported_model_audio.py](
 Argument			|	Description 
 ---					|	---
 -d, --export_dir	|	Dir where the trained model's meta graph and data were exported
--wd, --wav_dir		|	Dir where wav files are stored (all files' transcripts will be generated)
 -af, --wav_file		|	Wav file's location. Only one transcript generated. If --wav_dir is given, --wav_file will have no effect.
 -vf, --video_file	|	Video file's location. Only one transcript generated. If --wav_dir or --wav_file are also given as args, --video_file will have no effect.
 -n, --model_name	|	Name of the model exported

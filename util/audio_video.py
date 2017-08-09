@@ -4,6 +4,13 @@ import numpy as np
 from python_speech_features import mfcc
 import scipy.io.wavfile as wav
 
+def make_equal_dim(feature1, feature2, diff):
+	if diff > 0:
+		# Feature1 is bigger
+		return feature1[:-diff], feature2
+	else:
+		return feature1, feature2[:diff]
+
 def get_audio_visual_feature_vector(audio_file_path, json_file_path, numcep, numcontext):
 	with open(json_file_path, 'r') as f:
 		data = json.loads(f.read())
@@ -29,8 +36,11 @@ def get_audio_visual_feature_vector(audio_file_path, json_file_path, numcep, num
 	# For our video, normal frame rate is 25, or time difference between each frame is 0.04s(approx).
 	# The above function returns MFCC features at every 0.005 time step.
 	# For having equal audio and visual features, we must extract MFCC features after every 0.04 secs.
+	if len(orig_inputs) != visual_feature.shape[0]:
+		orig_inputs, visual_feature = make_equal_dim(
+										orig_inputs, visual_feature, 
+										len(orig_inputs) - visual_feature.shape[0])
 	
-	assert len(orig_inputs) == visual_feature.shape[0]
 		
 	orig_inputs = (orig_inputs - np.mean(orig_inputs))/np.std(orig_inputs)
 	visual_feature = (visual_feature - np.mean(visual_feature))/np.std(visual_feature)

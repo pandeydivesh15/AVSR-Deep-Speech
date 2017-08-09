@@ -13,13 +13,13 @@ fi
 
 python -u DeepSpeech_RHL_AVSR.py \
   --train_files data/clean_data/train/data.csv \
-  --dev_files data/clean_data/train/data.csv \
-  --test_files data/clean_data/train/data.csv \
+  --dev_files data/clean_data/dev/data.csv \
+  --test_files data/clean_data/test/data.csv \
   --train_batch_size 10 \
   --dev_batch_size 10 \
   --test_batch_size 10 \
   --n_hidden 494 \
-  --epoch 50 \
+  --epoch 65 \
   --dropout_rate 0.10 \
   --validation_step 5 \
   --display_step 5 \

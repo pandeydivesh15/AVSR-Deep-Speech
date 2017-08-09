@@ -67,16 +67,14 @@ class DeepSpeechModel(object):
 				N_CONTEXT))])
 		else:
 			source = np.array([(audiofile_to_input_vector(wav_file_path, NUM_MFCC_COEFF , N_CONTEXT))])
-
 		source_len = np.array([(len(source[-1]))])
 
 		feed_dict = {self.input:source, self.input_len:source_len}
 
-		decoded = self.session.run(self.output, feed_dict)[0][0] 
+		decoded = self.session.run(self.output, feed_dict)[0][0]
 		# session.run() will return shape = (1,1,X). X = Number of characters in the transcript
-	
-		transcript = ndarray_to_text(decoded)
 
+		transcript = ndarray_to_text(decoded)
 		if self.use_spell_check:
 			transcript = correction(transcript)
 

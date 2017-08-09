@@ -30,7 +30,6 @@ AE_LAYER_NAMES = [['gbrbm_1_w', 'gbrbm_1_h'],
 
 PROCESSED_VIDEO_DATA_DIR = "./data/auto_encoder_output/" 
 
-AE_OUTPUT_DICT = {}
 AUTO_ENCODER = None
 
 def load_trained_models():
@@ -51,6 +50,7 @@ def load_AE():
 					32*32, 
 					encoding_layer_sizes=[2000, 1000, 500, 50], 
 					layer_names=AE_LAYER_NAMES)
+
 	AUTO_ENCODER.load_parameters(AE_MODEL_DIR+'auto_enc')
 
 def crop_suitable_face(rects, frame):
@@ -81,7 +81,6 @@ def crop_suitable_face(rects, frame):
 	resized = resize(mouth_roi, 32, 32)
 	resized = cv2.cvtColor(resized, cv2.COLOR_RGB2GRAY)
 	return resized
-
 
 def validate_frames(all_frames):	
 	mouth_regions = []
@@ -175,7 +174,6 @@ def preprocess_videos(output_dir_train, output_dir_dev, output_dir_test,
 	random.shuffle(data)
 
 	total_split_files = len(data)
-	print total_split_files
 	dev_limit_start = int(train_split * total_split_files)
 	dev_limit_end = dev_limit_start + int(dev_split * total_split_files)
 
@@ -206,6 +204,31 @@ def preprocess_videos(output_dir_train, output_dir_dev, output_dir_test,
 			split_info=i[3])
 
 		split_file_count += 1
+
+def extract_and_store_visual_features(video_file_path, json_dir, json_name):
+	load_trained_models()
+	load_AE()
+
+	stream = VideoStream(video_file_path)
+	stream.start()
+
+	mouth_regions = []
+	cnt = 0
+	while not stream.is_empty():
+		frame = stream.read()
+		frame = resize(frame, IMAGE_WIDTH)
+		rects = FACE_DETECTOR_MODEL(frame, 0)
+		region = crop_suitable_face(rects, frame)
+		if region is None:
+			# If no proper face region could be detected, we fill normally distributed random values
+			mouth_regions.append(np.random.normal(size=32*32))
+		else:
+			mouth_regions.append(region.reshape(32*32))
+
+	mouth_regions = np.array(mouth_regions)
+	
+	encode_and_store(mouth_regions, json_dir, json_name.split('.')[0])
+	AUTO_ENCODER.close()
 
 
 

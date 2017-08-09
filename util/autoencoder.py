@@ -164,3 +164,7 @@ class AutoEncoder:
 	def save_parameters(self, path):
 		saver = tf.train.Saver(self.layer_map)
 		saver.save(self.sess, path)
+
+	def close(self):
+		tf.reset_default_graph()
+		self.sess.close()

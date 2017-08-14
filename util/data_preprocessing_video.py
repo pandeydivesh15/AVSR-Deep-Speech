@@ -10,7 +10,7 @@ import tensorflow as tf
 import numpy as np
 
 from util.data_preprocessing import read_json_file, find_text_and_time_limits, split
-from util.data_preprocessing_autoencoder import resize, get_mouth_coord
+from util.data_preprocessing_autoencoder import resize, get_mouth_coord, visualize
 from util.video_stream import VideoStream 
 from util.autoencoder import AutoEncoder
 
@@ -53,29 +53,74 @@ def load_AE():
 
 	AUTO_ENCODER.load_parameters(AE_MODEL_DIR+'auto_enc')
 
-def crop_suitable_face(rects, frame):
+def crop_suitable_face(rects, frame, prev_frame_faces=None):
 	if not rects:
-		# If NO face is present in the frame, return `None`
-		return None
-	rect = rects[0]
+		# If NO face is present in the frame, return some suitable face from `prev_frame_faces`.
+		# IF no suitable face found, return `None`
+		if not prev_frame_faces:
+			# If no previous frame
+			return None
+		# Recursive definition	
+		return crop_suitable_face(prev_frame_faces[-1][0], prev_frame_faces[-1][1], prev_frame_faces[:-1])
+
+	mouth_coordinates = None 
+	# We need to find correct mouth region in the frame: Speaker's mouth region
+
 	if len(rects) > 1:
-		# TODO
-		# If there are mutliple faces detected, select suitable frame.
-		# For now, we choose the first face in the `rects`. 
-		# Implementation left. 
-		rect = rects[0]
+		# If there are multiple faces detected, select suitable frame.
+		if (not prev_frame_faces) or (len(prev_frame_faces[-1][0]) != len(rects)):
+			# If no previous frames info available OR 
+			# If faces detected in current frame were not present in the previous frame,
+			# 	(currently only checking if number of faces in current and previous frame are not equal)
+			# Then, we select most probable face in the current frame, 
+			# We choose the face whose mouth is wide open (largest area in the frame).
 
-	# Get landmarks
-	landmarks = LANDMARKS_PREDICTOR(frame, rect)
-	mouth_coordinates = get_mouth_coord(landmarks)
+			max_mouth_area = -1.0
+	
+			for r in rects:
+				landmarks = LANDMARKS_PREDICTOR(frame, r)
+				coordinates = get_mouth_coord(landmarks)
+				area = cv2.contourArea(coordinates)
+				if max_mouth_area < area:
+					max_mouth_area = area
+					mouth_coordinates = coordinates
+		else:
+			# Select best speaker face by calculating mean squared difference
+			# of the pixel values (mouth region) between the current and the previous frame.
 
+			# It is expected that both current frame's `rects` and previous frame's `rects`
+			# contains same faces and in same order.
+
+			max_square_diff = -1.0
+
+			for curr_r, prev_r in zip(rects, prev_frame_faces[-1][0]):
+				landmarks = LANDMARKS_PREDICTOR(frame, curr_r)
+				coordinates = get_mouth_coord(landmarks)				
+				# Find bounding rectangle for mouth coordinates
+				x, y, w, h = cv2.boundingRect(coordinates)				
+				
+				mouth_roi_1 = frame[y:y + h, x:x + w]
+				mouth_roi_2 = prev_frame_faces[-1][1][y:y + h, x:x + w]
+				
+				MSD = ((mouth_roi_1 - mouth_roi_2)**2).mean()
+				# MSD = Mean Square Difference
+				if MSD > max_square_diff:
+					max_square_diff = MSD
+					mouth_coordinates = coordinates
+					
+	else:
+		# If there is only one face.
+		# Get landmarks
+		landmarks = LANDMARKS_PREDICTOR(frame, rects[0])
+		mouth_coordinates = get_mouth_coord(landmarks)
+		
 	# Crop suitable portion
 	x, y, w, h = cv2.boundingRect(mouth_coordinates)
 	mouth_roi = frame[y:y + h, x:x + w]
 
 	h, w, channels = mouth_roi.shape
 	# If the cropped region is very small, ignore this case.
-	if h < 10 or w < 10:
+	if h < 4 or w < 4:
 		return None
 	
 	resized = resize(mouth_roi, 32, 32)
@@ -83,12 +128,21 @@ def crop_suitable_face(rects, frame):
 	return resized
 
 def validate_frames(all_frames):	
+	prev_frame_faces = []
+	# Keeps record of previous frames and faces found in previous frames. Initially it is empty.
+	# This will help in speaker identification in case of multiple faces detected.
+
 	mouth_regions = []
 	for frame in all_frames:
 		rects = FACE_DETECTOR_MODEL(frame, 0)
-		region = crop_suitable_face(rects, frame)
+		region = crop_suitable_face(rects, frame, prev_frame_faces)
 		if region is None:
 			return None
+		
+		# Update previous frames. Max size of `prev_frame_faces` = 5
+		prev_frame_faces.append((rects, frame))
+		if len(prev_frame_faces) > 5 : prev_frame_faces.remove(prev_frame_faces[0])
+
 		region = region.reshape(32*32)
 		mouth_regions.append(region)
 
@@ -190,7 +244,6 @@ def preprocess_videos(output_dir_train, output_dir_dev, output_dir_test,
 		else:
 			output_dir = output_dir_test
 
-
 		# Encode all the mouth region images using AutoEncoder and store encodings
 		# For visual speech recognition
 		encode_and_store(i[2], output_dir, i[0])
@@ -213,17 +266,23 @@ def extract_and_store_visual_features(video_file_path, json_dir, json_name):
 	stream.start()
 
 	mouth_regions = []
-	cnt = 0
+	prev_frame_faces = []
+	# Keeps record of previous frames and faces found in previous frames. Initially it is empty.
+
 	while not stream.is_empty():
 		frame = stream.read()
 		frame = resize(frame, IMAGE_WIDTH)
 		rects = FACE_DETECTOR_MODEL(frame, 0)
-		region = crop_suitable_face(rects, frame)
+		region = crop_suitable_face(rects, frame, prev_frame_faces)
 		if region is None:
 			# If no proper face region could be detected, we fill normally distributed random values
 			mouth_regions.append(np.random.normal(size=32*32))
 		else:
 			mouth_regions.append(region.reshape(32*32))
+
+		# Update previous frames. Max size of `prev_frame_faces` = 5
+		prev_frame_faces.append((rects, frame))
+		if len(prev_frame_faces) > 5 : prev_frame_faces.remove(prev_frame_faces[0])
 
 	mouth_regions = np.array(mouth_regions)
 	

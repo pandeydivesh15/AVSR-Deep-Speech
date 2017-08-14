@@ -113,7 +113,7 @@ def crop_suitable_face(rects, frame, prev_frame_faces=None):
 		# Get landmarks
 		landmarks = LANDMARKS_PREDICTOR(frame, rects[0])
 		mouth_coordinates = get_mouth_coord(landmarks)
-		
+
 	# Crop suitable portion
 	x, y, w, h = cv2.boundingRect(mouth_coordinates)
 	mouth_roi = frame[y:y + h, x:x + w]
@@ -273,6 +273,11 @@ def extract_and_store_visual_features(video_file_path, json_dir, json_name):
 		frame = stream.read()
 		frame = resize(frame, IMAGE_WIDTH)
 		rects = FACE_DETECTOR_MODEL(frame, 0)
+
+		# rects = FACE_DETECTOR_MODEL(frame, 1) 
+		# This can increase efficiency in detecting mutiple faces; this can help in correct speaker detection.
+		# However, computing time will also be increased
+
 		region = crop_suitable_face(rects, frame, prev_frame_faces)
 		if region is None:
 			# If no proper face region could be detected, we fill normally distributed random values

@@ -12,6 +12,16 @@ def make_equal_dim(feature1, feature2, diff):
 		return feature1, feature2[:diff]
 
 def get_audio_visual_feature_vector(audio_file_path, json_file_path, numcep, numcontext):
+	"""
+	Args:
+		1. audio_file_path: File path for audio file (.wav file)
+		2. json_file_path: File path for JSON file storing visual features. 
+		3. numcep: Number of units in initial layer of neural network.
+			In case of audio-only model: numcep = 26
+			In case of AVSR model: numcep = 26+50 = 76
+		4. numcontext: Determines window size for adding context info to each individual value.
+	"""
+
 	with open(json_file_path, 'r') as f:
 		data = json.loads(f.read())
 		file_name = data['name']

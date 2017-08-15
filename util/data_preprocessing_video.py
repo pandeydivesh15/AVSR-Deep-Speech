@@ -23,12 +23,10 @@ VIDEO_DIR = "./data/RHL_mp4/"
 AUDIO_DIR = "./data/RHL_wav/"
 JSON_DIR  = "./data/RHL_json/"
 AE_MODEL_DIR = "./data/AE_and_RBM_model_saves/"
-AE_LAYER_NAMES = [['gbrbm_1_w', 'gbrbm_1_h'],
+AE_LAYER_NAMES = [['gbrbm_1_w', 'gbrbm_1_h'], # Layer names will help us in restoring trained Autoencoder
 				  ['bbrbm_1_w', 'bbrbm_1_h'],
 				  ['bbrbm_2_w', 'bbrbm_2_h'], 
-				  ['bgrbm_1_w', 'bgrbm_1_h']]
-
-PROCESSED_VIDEO_DATA_DIR = "./data/auto_encoder_output/" 
+				  ['bgrbm_1_w', 'bgrbm_1_h']] 
 
 AUTO_ENCODER = None
 
@@ -41,6 +39,9 @@ def load_trained_models():
 	LANDMARKS_PREDICTOR = dlib.shape_predictor("data/dlib_data/shape_predictor_68_face_landmarks.dat")
 
 def load_AE():
+	"""
+		Loads trained autoencoder (for finding encoded features for each mouth region).
+	"""
 	global AUTO_ENCODER
 
 	if AUTO_ENCODER is not None:
@@ -54,6 +55,17 @@ def load_AE():
 	AUTO_ENCODER.load_parameters(AE_MODEL_DIR+'auto_enc')
 
 def crop_suitable_face(rects, frame, prev_frame_faces=None):
+	"""
+	Args:
+		1. rects:				all faces detected in a given frame by `FACE_DETECTOR_MODEL`
+		2. frame:				current frame of the video.
+		3. prev_frame_faces:	If given, speaker detection (among multiple faces) will be used.
+								Every element of `prev_frame_faces` must be a tuple (x, y); 
+								x = rects found in previous frame.
+								y = previous frame
+								Length of `prev_frame_faces` will determine how many previous frames to be used.
+	"""
+
 	if not rects:
 		# If NO face is present in the frame, return some suitable face from `prev_frame_faces`.
 		# IF no suitable face found, return `None`
@@ -127,7 +139,14 @@ def crop_suitable_face(rects, frame, prev_frame_faces=None):
 	resized = cv2.cvtColor(resized, cv2.COLOR_RGB2GRAY)
 	return resized
 
-def validate_frames(all_frames):	
+def validate_frames(all_frames):
+	"""
+	Args:
+		1. all_frames:		All frames to be studied for training our AVSR model.
+
+	If this function returns `None`, then `all_frames` are not suitable for training our AVSR.
+	In other cases, the function returns numpy array of mouth regions.
+	"""	
 	prev_frame_faces = []
 	# Keeps record of previous frames and faces found in previous frames. Initially it is empty.
 	# This will help in speaker identification in case of multiple faces detected.
@@ -149,6 +168,14 @@ def validate_frames(all_frames):
 	return np.array(mouth_regions)
 
 def run_video_and_refine(video_file_path, split_info):
+	"""
+	Args:
+		1. video_file_path:	File path to be used for training AVSR.
+		2. split_info:		This variable is similar to the one used in the case of audio-only model training.
+							For more details, please see util.data_preprocessing.find_text_and_time_limits() 
+							and util.data_preprocessing..split() functions.
+
+	"""
 	video_name = video_file_path.split('/')[-1].split(".")[0]
 
 	stream = VideoStream(video_file_path)
@@ -194,6 +221,13 @@ def run_video_and_refine(video_file_path, split_info):
 	return data
 
 def encode_and_store(batch_x, output_dir, file_name):
+	"""
+	Args:
+		1. batch_x:			Batch of 32*32 images which will go inside our autoencoder.
+		2. output_dir:		Dir path for storing all encoded features for given `batch_x`.
+							Features will be stored in the form of JSON file.
+		3. file_name:		File name of JSON file.
+	"""
 	global AUTO_ENCODER
 	if AUTO_ENCODER is None:
 		load_AE()
@@ -211,6 +245,14 @@ def encode_and_store(batch_x, output_dir, file_name):
 
 def preprocess_videos(output_dir_train, output_dir_dev, output_dir_test, 
 					  train_split, dev_split, test_split):
+	"""
+	Args:
+		1. output_dir_train:	Dir which will store all training files.
+		2. output_dir_dev:		Dir which will store all validation files.
+		3. output_dir_test:		Dir which will store all test files.
+		4. train_split, dev_split, test_split:
+								Ratio which decides number of training/validation/test files.
+	"""
 	json_file_paths = sorted(glob.glob(JSON_DIR + "*.json"))
 
 	load_trained_models()
@@ -259,9 +301,20 @@ def preprocess_videos(output_dir_train, output_dir_dev, output_dir_test,
 		split_file_count += 1
 
 def extract_and_store_visual_features(video_file_path, json_dir, json_name):
+	"""
+		This function extracts visual features from the given video and stores them in a JSON file.
+		This function will NOT be used while preparing training/test/dev data for our model.
+		This function only runs through `bin/run_exported_model_AVSR.py` script.
+	Args:
+		1. video_file_path:		File path for the video to be processed.
+		2. json_dir:			Dir where JSON file will exist.
+		3. json_name:			Name to be given to JSON file.
+	"""
+	# first load all trained models: DLIB's models and Autoencoder.
 	load_trained_models()
 	load_AE()
 
+	# Start reading video.
 	stream = VideoStream(video_file_path)
 	stream.start()
 
@@ -291,6 +344,7 @@ def extract_and_store_visual_features(video_file_path, json_dir, json_name):
 
 	mouth_regions = np.array(mouth_regions)
 	
+	# Find and store visual features.
 	encode_and_store(mouth_regions, json_dir, json_name.split('.')[0])
 	AUTO_ENCODER.close()
 

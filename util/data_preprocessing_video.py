@@ -328,6 +328,11 @@ def extract_and_store_visual_features(video_file_path, json_dir, json_name):
 	stream = VideoStream(video_file_path)
 	stream.start()
 
+	FPS = stream.stream.get(cv2.CAP_PROP_FPS)
+
+	if round(FPS) != FIXED_VIDEO_FPS:
+		return False
+
 	mouth_regions = []
 	prev_frame_faces = []
 	# Keeps record of previous frames and faces found in previous frames. Initially it is empty.
@@ -357,6 +362,8 @@ def extract_and_store_visual_features(video_file_path, json_dir, json_name):
 	# Find and store visual features.
 	encode_and_store(mouth_regions, json_dir, json_name.split('.')[0])
 	AUTO_ENCODER.close()
+
+	return True
 
 
 

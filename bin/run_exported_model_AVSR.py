@@ -45,7 +45,12 @@ cmd = "ffmpeg -i " + args.video_file + " -ab 96k -ar 44100 -vn " + temp_dir + te
 subprocess.call(cmd, shell=True)
 
 # Now extract visual features from the video and store them in a JSON file.
-extract_and_store_visual_features(args.video_file, temp_dir, temp_json_name)
+status = extract_and_store_visual_features(args.video_file, temp_dir, temp_json_name)
+
+if not status:
+	print "[ERROR] Stopped due to incorrect video FPS.(Required FPS=30)"
+	os.remove(temp_dir+temp_wav_name) # delete temporary audio file 
+	exit()
 
 model = DeepSpeechModel(export_dir, model_name, args.use_spell_check, use_visual_features=True)
 model.restore_model()

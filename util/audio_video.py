@@ -38,20 +38,19 @@ def get_audio_visual_feature_vector(audio_file_path, json_file_path, numcep, num
 	fs, audio = wav.read(audio_file_path)
 
 	# Get mfcc coefficients
-	orig_inputs = mfcc(audio, samplerate=fs, numcep=26)
+	orig_inputs = mfcc(audio, samplerate=fs, numcep=26, winstep=0.03334)
+	# For our video, expected frame rate is 30, or time difference between each frame is 0.03334s(approx).
+	# The above function returns MFCC features at every 0.03334s time step.
+	# For having equal audio and visual features, we must extract MFCC features after every 0.03334 secs.
 
-	# We only keep every 8th feature (BiRNN stride = 8)
-	orig_inputs = orig_inputs[::8]
-	# This is done so that we can match with FPS of our video.
-	# For our video, normal frame rate is 25, or time difference between each frame is 0.04s(approx).
-	# The above function returns MFCC features at every 0.005 time step.
-	# For having equal audio and visual features, we must extract MFCC features after every 0.04 secs.
+	# We only keep every 2nd feature (BiRNN stride = 2)
+	orig_inputs = orig_inputs[::2]
+	
 	if len(orig_inputs) != visual_feature.shape[0]:
 		orig_inputs, visual_feature = make_equal_dim(
 										orig_inputs, visual_feature, 
 										len(orig_inputs) - visual_feature.shape[0])
 	
-		
 	orig_inputs = (orig_inputs - np.mean(orig_inputs))/np.std(orig_inputs)
 	visual_feature = (visual_feature - np.mean(visual_feature))/np.std(visual_feature)
 	modified_inputs = np.hstack((orig_inputs, visual_feature))

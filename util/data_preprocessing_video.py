@@ -22,6 +22,7 @@ IMAGE_WIDTH = 500 # Every frame will be resized to this width before any process
 VIDEO_DIR = "./data/RHL_mp4/"
 AUDIO_DIR = "./data/RHL_wav/"
 JSON_DIR  = "./data/RHL_json/"
+
 AE_MODEL_DIR = "./data/AE_and_RBM_model_saves/"
 AE_LAYER_NAMES = [['gbrbm_1_w', 'gbrbm_1_h'], # Layer names will help us in restoring trained Autoencoder
 				  ['bbrbm_1_w', 'bbrbm_1_h'],
@@ -29,6 +30,7 @@ AE_LAYER_NAMES = [['gbrbm_1_w', 'gbrbm_1_h'], # Layer names will help us in rest
 				  ['bgrbm_1_w', 'bgrbm_1_h']] 
 
 AUTO_ENCODER = None
+FIXED_VIDEO_FPS = 30.0 # Videos with FPS == 30 will only be used.
 
 def load_trained_models():
 	if not os.path.isfile("data/dlib_data/shape_predictor_68_face_landmarks.dat"):
@@ -126,6 +128,10 @@ def crop_suitable_face(rects, frame, prev_frame_faces=None):
 		landmarks = LANDMARKS_PREDICTOR(frame, rects[0])
 		mouth_coordinates = get_mouth_coord(landmarks)
 
+	# visualize(frame, [mouth_coordinates])
+	# if cv2.waitKey(1) & 0xFF == ord('q'):
+	# 	pass
+
 	# Crop suitable portion
 	x, y, w, h = cv2.boundingRect(mouth_coordinates)
 	mouth_roi = frame[y:y + h, x:x + w]
@@ -182,6 +188,10 @@ def run_video_and_refine(video_file_path, split_info):
 	stream.start()
 
 	FPS = stream.stream.get(cv2.CAP_PROP_FPS)
+
+	if round(FPS) != FIXED_VIDEO_FPS:
+		print "[WARNING] Ignoring " + video_file_path + " due to incorrect FPS.(Required FPS=30)"
+		return []
 
 	time_elapsed = 0.00
 	time_end = split_info[-1][1][1] 

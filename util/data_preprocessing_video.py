@@ -191,6 +191,7 @@ def run_video_and_refine(video_file_path, split_info):
 
 	if round(FPS) != FIXED_VIDEO_FPS:
 		print "[WARNING] Ignoring " + video_file_path + " due to incorrect FPS.(Required FPS=30)"
+		stream.stop()
 		return []
 
 	time_elapsed = 0.00

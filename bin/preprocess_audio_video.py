@@ -41,13 +41,19 @@ print "[INFO]: Main video files converted to .wav files."
 
 # Generates data for audio-visual speech recognition
 # Visual encodings are stored as JSON files and audio data as .wav files
-data_preprocessing_video.preprocess_videos(
+status = data_preprocessing_video.preprocess_videos(
 	args.output_dir_train,
 	args.output_dir_dev,
 	args.output_dir_test,
 	args.train_split,
 	args.dev_split,
 	args.test_split)
+
+if not status:
+	print "[ERROR] Make sure that you have atleast one video file with correct FPS" \
+		  + " / or which is trainable for AVSR."
+	exit()
+
 print "[INFO]: Train/Dev/Test files generated. Now creating CSVs."
 
 # Create CSVs out of all split files.

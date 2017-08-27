@@ -278,6 +278,9 @@ def preprocess_videos(output_dir_train, output_dir_dev, output_dir_test,
 		file_name = path.split('/')[-1].split('.')[0]
 		data.extend(run_video_and_refine(VIDEO_DIR+file_name+'.mp4', info))
 
+	if not data:
+		return False
+
 	random.shuffle(data)
 
 	total_split_files = len(data)
@@ -310,6 +313,8 @@ def preprocess_videos(output_dir_train, output_dir_dev, output_dir_test,
 			split_info=i[3])
 
 		split_file_count += 1
+
+	return True
 
 def extract_and_store_visual_features(video_file_path, json_dir, json_name):
 	"""

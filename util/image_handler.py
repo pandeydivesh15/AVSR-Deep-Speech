@@ -8,6 +8,7 @@ from scipy.ndimage import imread
 IMAGE_WIDTH = IMAGE_HEIGHT = 32
 
 def visualize_image(image, name="Image", resize=False, save_image=False, path=None):
+	"""Helper function to visualize and save any image"""
 	image = image.reshape([IMAGE_WIDTH, IMAGE_HEIGHT])
 	image = image.astype(np.uint8)
 
@@ -37,6 +38,9 @@ class ImageDataSet():
 		self.test = None
 
 	def read_data(self, train_split=0.80, dev_split=0.10, test_split=0.10):
+		"""
+		Class function to read images from `self.image_dir`and split them into three groups: train/dev/test.
+		"""
 		assert (train_split + dev_split + test_split == 1.0)
 
 		all_images = glob.glob(self.image_dir + "*.png")
@@ -70,6 +74,10 @@ class ImageDataSet():
 			'test':		self.test}
 
 	def get_data(self, choice='train'):
+		"""
+		Helper function to get train/dev/split data.
+		"""
+
 		assert (choice == 'train' or choice == 'dev' or choice == 'test')
 		assert self.train is not None
 

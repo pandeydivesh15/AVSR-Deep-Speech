@@ -17,9 +17,13 @@ This project is based on the approach discussed in paper [Deep Speech](https://a
 		* [Preparing data for training Autoencoder](#preparing-data-for-training-autoencoder)
 		* [Preparing data for AVSR](#preparing-data-for-avsr)
 3. [Training](#training)
+	* [Audio-only Model](#deepspeech_rhlpy)
+	* [Audi-Visual Model (AVSR)](#deepspeech_rhl_avsrpy)
 4. [Checkpointing](#checkpointing)
 5. [Some Training Results](#some-training-results)
 6. [Exporting model and Testing](#exporting-model-and-testing)
+	* [Audio-only Model](#audio-only-speech-model)
+	* [Audio-Visual Model (AVSR)](#audio-video-speech-model-avsr)
 7. [Acknowledgments](#acknowledgments)
 
 ## Getting Started
@@ -39,6 +43,7 @@ This project is based on the approach discussed in paper [Deep Speech](https://a
 * **For Audio-Visual Speech Recognition**:
 
 	In addition to above requirements, you will also require:
+
 	* [OpenCV 3.x for Python](http://docs.opencv.org/trunk/d7/d9f/tutorial_linux_install.html)
 	* [scikit-image](http://scikit-image.org/download.html)
 	* [Dlib for Python](http://www.pyimagesearch.com/2017/03/27/how-to-install-dlib/)
@@ -124,7 +129,7 @@ After this step, there will be three kinds of file formats for each file name. F
 
 ## Training
 
-#### Original DeepSpeech
+#### *Original DeepSpeech*
 
 The original [Deep Speech model](https://github.com/mozilla/DeepSpeech), provided many command line options. To view those options, directly open the [main script](./DeepSpeech.py) or you can also type:
 ```bash
@@ -138,7 +143,7 @@ $ ./bin/run-ldc93s1.sh
 ```
 This script first installs the LDC93S1 dataset at data/ldc93s1/. Afterward, it runs DeepSpeech.py. It trains on LDC93S1 dataset, outputs stats for each epoch, and finally outputs WER report for any dev or test data.
 
-#### DeepSpeech_RHL.py
+#### *DeepSpeech_RHL.py*
 
 Any code modifications for Red Hen Lab will be reflected in [**DeepSpeech_RHL.py**](./DeepSpeech_RHL.py). One such modification is that DeepSpeech_RHL.py allows transcripts to have digits[0-9] too, unlike original [DeepSpeech.py](./DeepSpeech.py).
 
@@ -156,7 +161,17 @@ $ ./bin/run-ldc93s1_RHL.sh
 # This script runs on LDC93S1 dataset. It doesn't exports any model.
 ```
 
-Feel free to modify any of the above scripts for your use.
+#### *DeepSpeech_RHL_AVSR.py*
+
+This script deals with audio-visual speech recognition. Before running this script, make sure that you have all prepared data at data/clean_data/ dir. See [this](#preparing-data-for-avsr) for more details.
+
+To train AVSR model (using data placed at data/clean_data/), open terminal and run:
+
+```bash
+$ ./bin/run_case_HPC_AVSR.sh
+```
+
+**Note: Feel free to modify any of the above scripts for your use.**
 
 ## Checkpointing
 
@@ -188,20 +203,29 @@ These results are based on a **one hour** long audio file. The file was split in
 
 ## Exporting model and Testing
 
-If the `--export_dir` parameter is provided to DeepSpeech_RHL.py, a model will have been exported to this directory during training. This exported model can then be used for predicting transcripts for new audio/video files.
+If the `--export_dir` parameter is provided to DeepSpeech_RHL.py, a model will have been exported to this directory during training. This trained exported model can then be used for predicting transcripts for new audio/video files.
 
-For running an exported model for new inputs, see [run_exported_model_audio.py](./bin/run_exported_model_audio.py). This python script allows four optional arguments.
+There are two scripts: 
+1. For audio-only model: [run_exported_model_audio.py](./bin/run_exported_model_audio.py)
+2. For AVSR, [run_exported_model_AVSR.py](./bin/run_exported_model_AVSR.py)
+
+Both of them expect following args:
 
 Argument			|	Description 
 ---					|	---
 -d, --export_dir	|	Dir where the trained model's meta graph and data were exported
--af, --wav_file		|	Wav file's location. Only one transcript generated. If --wav_dir is given, --wav_file will have no effect.
--vf, --video_file	|	Video file's location. Only one transcript generated. If --wav_dir or --wav_file are also given as args, --video_file will have no effect.
 -n, --model_name	|	Name of the model exported
+-af, --wav_file		|	(Only for audio-only model) Wav file's location.
+-vf, --video_file	|	Video file's location. For audio only model, if --wav_file given, this option will have no effect.
+
 
 Options				|	Description
 ---					|	---
 --use_spell_check	|	Decide whether to use spell check system for decoded transcripts from RNN. If option is given, spell correction system (KenLM) will be used.
+
+*Usage examples:*
+
+#### *Audio only Speech Model*
 
 * For running an exported model with default settings, run:
 
@@ -213,17 +237,24 @@ Options				|	Description
 
 * Using command line options for running exported model:
 
+	Finding transcript for audio/video file using audio-only model:
+
 	```bash
 	$ python ./bin/run_exported_model_audio.py -d path_to_exported_model/ -n model_name -af /path_to_wav_file/file.wav 
 
-	# This finds transcript for given audio .wav file.
 	```
 
 	```bash
 	$ python ./bin/run_exported_model_audio.py -d path_to_exported_model/ -n model_name -vf /path_to_video_file/file.mp4 
-
-	# This finds transcript for given video file.
 	```
+
+#### *Audio-Video Speech Model (AVSR)*
+
+Finding transcript of a video file using AVSR:
+
+```bash
+$ python ./bin/run_exported_model_AVSR.py -d path_to_exported_model/ -n model_name -vf /path_to_video_file/file.mp4 
+```
 
 
 ## Acknowledgments

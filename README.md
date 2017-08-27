@@ -15,6 +15,7 @@ This project is based on the approach discussed in paper [Deep Speech](https://a
 	* [Audio-only Speech Recognition](#audio-only-speech-recognition)
 	* [Audio Visual Speech Recognition (AVSR)](#audio-visual-speech-recognition-avsr)
 		* [Preparing data for training Autoencoder](#preparing-data-for-training-autoencoder)
+		* [Training RBMs and Autoencoder](#training-rbms-and-autoencoder)
 		* [Preparing data for AVSR](#preparing-data-for-avsr)
 3. [Training](#training)
 	* [Audio-only Model](#deepspeech_rhlpy)
@@ -115,6 +116,17 @@ From the main project's directory, open terminal and type:
 ```bash
 $ ./bin/preprocessing_AE.sh
 ```
+
+##### Training RBMs and Autoencoder
+
+The script [bin/AE_training.py](./bin/AE_training.py) deals with training RBMs and autoencoder. It first trains RBMs and then using their weights, trains the main autoencoder.
+
+The bash script [bin/run_AE_training.sh](./bin/run_AE_training.sh) runs the bin/AE_training.py using default settings.
+
+```bash
+$ ./bin/run_AE_training.sh
+```
+
 
 ##### Preparing data for AVSR
 

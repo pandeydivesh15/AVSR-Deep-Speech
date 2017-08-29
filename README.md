@@ -25,7 +25,8 @@ This project is based on the approach discussed in paper [Deep Speech](https://a
 6. [Exporting model and Testing](#exporting-model-and-testing)
 	* [Audio-only Model](#audio-only-speech-model)
 	* [Audio-Visual Model (AVSR)](#audio-video-speech-model-avsr)
-7. [Acknowledgments](#acknowledgments)
+7. [Running code at Case HPC](#running-code-at-case-hpc)
+8. [Acknowledgments](#acknowledgments)
 
 ## Getting Started
 
@@ -267,6 +268,10 @@ Finding transcript of a video file using AVSR:
 ```bash
 $ python ./bin/run_exported_model_AVSR.py -d path_to_exported_model/ -n model_name -vf /path_to_video_file/file.mp4 
 ```
+
+## Running code at Case HPC
+
+Please read [**run_at_HPC.md**](./run_at_HPC.md) for running this project at Case HPC.
 
 
 ## Acknowledgments

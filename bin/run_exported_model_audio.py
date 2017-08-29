@@ -48,7 +48,7 @@ elif args.video_file:
 else:
 	wav_file_path = 'data/ldc93s1/LDC93S1.wav' # default .wav file
 
-transcript = model.find_transcripts('data/temp.wav')
+transcript = model.find_transcripts(wav_file_path)
 
 print "\n[Generated Transcript]\t", 
 print transcript
